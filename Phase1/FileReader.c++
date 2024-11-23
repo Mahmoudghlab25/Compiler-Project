@@ -1,7 +1,6 @@
 #include <iostream>
-#include <fstream>
-#include <vector>
-#include <string.h>
+#include <utility>
+#include <bits/stdc++.h>
 
 using namespace std;
 
@@ -11,15 +10,17 @@ private:
 
 public:
     // Constructor
-    FileReader(string filePath) : filePath(filePath) {}
+    explicit FileReader(string filePath) {
+        this->filePath = std::move(filePath);
+    }
 
     // Method to read the file line by line
-    vector<string> readLines(){
+    vector<string> readLines() {
         vector<string> lines;
         ifstream file(this->filePath);
 
         if (!file.is_open()) {
-            throw runtime_error("Failed to open file: " + this->filePath);
+            std::cerr << "Failed to open the file with path: " << this->filePath << endl;
         }
 
         string line;
@@ -30,16 +31,10 @@ public:
         file.close();
         return lines;
     }
-    void printLines(vector<string> codeLines){
-        for (auto line : codeLines) {
-            std::cout << line << std::endl;
+
+    void printLines(vector<string>& codeLines) {
+        for (const auto& line: codeLines) {
+            cout << line << endl;
         }
     }
 };
-
-int main(){
-    FileReader fileReader = FileReader("input.txt");
-    vector<string> codeLines = fileReader.readLines();
-    fileReader.printLines(codeLines);
-    return 0;
-}
