@@ -1,6 +1,6 @@
 #include <iostream>
 #include <bits/stdc++.h>
-#include "FileReader.cpp"
+#include "FileReader.c++"
 
 using namespace std;
 int main(){
