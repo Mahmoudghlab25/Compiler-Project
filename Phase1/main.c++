@@ -9,7 +9,7 @@ int main(){
         vector<string> codeLines = fileReader.readLines();
         fileReader.printLines(codeLines);
     }catch (exception& ex){
-        cerr << "Error: " << ex.what() << endl;
+        cerr << "Exception: " << ex.what() << endl;
     }
     return 0;
 }
