@@ -104,7 +104,7 @@ set<State *> NFAtoDFAConverter::e_closure(set<State *> T)
         st.pop();
 
         const map<char, set<State *>> &transitions = s->get_transitions();
-        auto it = transitions.find('\L');
+        auto it = transitions.find('\0');
         if (it != transitions.end())
         {
             const set<State *> &states = it->second;
