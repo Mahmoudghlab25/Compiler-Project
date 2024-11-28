@@ -23,7 +23,10 @@ public:
 
     // Get transitions
     const std::map<char, std::set<State *>> &get_transitions() const;
-
+    // Set transitions
+    void set_transitions(const std::map<char, std::set<State *>> &new_transitions){
+        this->transitions = new_transitions;
+    };
     // Check if accepting state
     bool is_accepting_state() const;
 
