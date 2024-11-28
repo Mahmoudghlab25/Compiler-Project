@@ -53,7 +53,7 @@ void NFAtoDFAConverter::create_DFA()
             {
                 subset_to_state_map[target_closure] = id;
 
-                string token_type;
+                string token_type = "";
                 bool is_accepting = std::any_of(
                     target_closure.begin(), target_closure.end(),
                     [&token_type](State *state)
