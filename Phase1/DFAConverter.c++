@@ -20,7 +20,7 @@ void NFAtoDFAConverter::create_DFA()
     set<State *> ss_e_closure = e_closure(nfa_start_set);
 
     subset_to_state_map[ss_e_closure] = id;
-    State *dfa_start_state = new State(id, /*is_accepting=*/false);
+    State *dfa_start_state = new State(id, /*is_accepting=*/false, "");
 
     this->start_state = dfa_start_state;
 
