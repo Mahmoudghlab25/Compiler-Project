@@ -4,7 +4,7 @@
 #include <string>
 #include "State.h"
 
-State::State(int id, bool is_accepting = false, const std::string &token_type = "")
+State::State(int id, bool is_accepting, const std::string &token_type)
     : id(id), is_accepting(is_accepting), token_type(token_type) {}
 
 // Add a transition

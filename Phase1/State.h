@@ -16,7 +16,7 @@ private:
 
 public:
     // Constructor
-    State(int id, bool is_accepting = false, const std::string &token_type = "");
+    State(int id, bool is_accepting, const std::string &token_type);
 
     // Add a transition
     void add_transition(char input, State *target);
