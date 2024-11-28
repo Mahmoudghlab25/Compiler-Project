@@ -20,7 +20,20 @@ void NFAtoDFAConverter::create_DFA()
     set<State *> ss_e_closure = e_closure(nfa_start_set);
 
     subset_to_state_map[ss_e_closure] = id;
-    State *dfa_start_state = new State(id, /*is_accepting=*/false, "");
+
+    string ss_token_type = "";
+    bool is_accepting = std::any_of(
+        ss_e_closure.begin(), ss_e_closure.end(),
+        [&ss_token_type](State *state)
+        {
+            if (state->is_accepting_state())
+            {
+                ss_token_type = state->get_token_type();
+                return true; // Stop once the first accepting state is found
+            }
+            return false;
+        });
+    State *dfa_start_state = new State(id, is_accepting, ss_token_type);
 
     this->start_state = dfa_start_state;
 
@@ -40,6 +53,8 @@ void NFAtoDFAConverter::create_DFA()
         {
             for (const auto &[input, targets] : state->get_transitions())
             {
+                if (!is_valid_transition(input))
+                    continue;
                 combined_transitions[input].insert(targets.begin(), targets.end());
             }
         }
@@ -121,6 +136,8 @@ set<State *> NFAtoDFAConverter::e_closure(set<State *> T)
 
     return T_closure;
 }
+
+bool NFAtoDFAConverter::is_valid_transition(char input) { return input != '\0'; }
 
 vector<unordered_map<char, int>> NFAtoDFAConverter::get_dfa_transition_table() { return dfa_transition_table; }
 

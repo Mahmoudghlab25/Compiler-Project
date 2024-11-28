@@ -29,6 +29,8 @@ public:
 
     std::set<State *> e_closure(std::set<State *> T);
 
+    bool is_valid_transition(char input);
+
     std::vector<std::unordered_map<char, int>> get_dfa_transition_table();
 
     std::vector<State *> get_dfa_states();
