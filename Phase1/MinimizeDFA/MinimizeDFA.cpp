@@ -156,34 +156,171 @@ int main() {
 //    delete I;
     //test 2
     // Step 1: Create States
-    State *q0 = new State(0, false, "");
-    State *q1 = new State(1, false, "");
-    State *q2 = new State(2, true, "TOKEN");
-    State *q3 = new State(3, true, "TOKEN");
-
+//    State *q0 = new State(0, false, "");
+//    State *q1 = new State(1, false, "");
+//    State *q2 = new State(2, true, "TOKEN");
+//    State *q3 = new State(3, true, "TOKEN");
+//
+//    // Step 2: Define Transitions
+//    q0->add_transition('a', q1);
+//    q0->add_transition('b', q2);
+//    q1->add_transition('a', q0);
+//    q1->add_transition('b', q3);
+//    q2->add_transition('a', q3);
+//    q2->add_transition('b', q0);
+//    q3->add_transition('a', q2);
+//    q3->add_transition('b', q1);
+//
+//    // Step 3: Build Transition Table (state IDs)
+//    std::vector<std::unordered_map<char, int>> transitionTable = {
+//            {{'a', 1}, {'b', 2}}, // q0
+//            {{'a', 0}, {'b', 3}}, // q1
+//            {{'a', 3}, {'b', 0}}, // q2
+//            {{'a', 2}, {'b', 1}}  // q3
+//    };
+//
+//    // Step 4: Define Alphabet
+//    std::set<char> alphabet = {'a', 'b'};
+//
+//    // Step 5: Create DFA
+//    std::vector<State *> dfa = {q0, q1, q2, q3};
+//
+//    // Step 6: Minimize DFA
+//    MinimizeDFA minimizer;
+//    std::set<State *> minimized_dfa = minimizer.minDFA(dfa, transitionTable, alphabet);
+//
+//    // Step 7: Output Minimized DFA
+//    std::cout << "Minimized DFA States:\n";
+//    for (State *state : minimized_dfa) {
+//        state->print_state();
+//    }
+//
+//    // Clean up allocated memory
+//    delete q0;
+//    delete q1;
+//    delete q2;
+//    delete q3;
+    //test 3
+    // Step 1: Create States
+//    State *A = new State(0, false, "");
+//    State *B = new State(1, false, "");
+//    State *C = new State(2, false, "");
+//    State *D = new State(3, false, "");
+//    State *E = new State(4, true, "TOKEN");
+//    // Step 2: Define Transitions
+//    A->add_transition('a', B);
+//    A->add_transition('b', C);
+//    B->add_transition('a', B);
+//    B->add_transition('b', D);
+//    C->add_transition('a', B);
+//    C->add_transition('b', C);
+//    D->add_transition('a', B);
+//    D->add_transition('b', E);
+//    E->add_transition('a', B);
+//    E->add_transition('b', C);
+//
+//    // Step 3: Build Transition Table (state IDs)
+//    std::vector<std::unordered_map<char, int>> transitionTable = {
+//            {{'a', 1}, {'b', 2}}, // A
+//            {{'a', 1}, {'b', 3}}, // B
+//            {{'a', 1}, {'b', 2}}, // C
+//            {{'a', 1}, {'b', 4}}, // D
+//            {{'a', 1}, {'b', 2}}  // E
+//    };
+//
+//    // Step 4: Define Alphabet
+//    std::set<char> alphabet = {'a', 'b'};
+//
+//    // Step 5: Create DFA
+//    std::vector<State *> dfa = {A, B, C, D, E};
+//
+//    // Step 6: Minimize DFA
+//    MinimizeDFA minimizer;
+//    std::set<State *> minimized_dfa = minimizer.minDFA(dfa, transitionTable, alphabet);
+//
+//    // Step 7: Output Minimized DFA
+//    std::cout << "Minimized DFA States:\n";
+//    for (State *state : minimized_dfa) {
+//        state->print_state();
+//    }
+//
+//    // Clean up allocated memory
+//    delete A;
+//    delete B;
+//    delete C;
+//    delete D;
+//    delete E;
+    // test4
+//    State *C = new State(0, false, "");
+//    State *A = new State(1, true, "TOKEN");
+//    State *B = new State(2, true, "TOKEN");
+//    // Step 2: Define Transitions
+//    A->add_transition('0', B);
+//    A->add_transition('1', C);
+//    B->add_transition('0', C);
+//    B->add_transition('1', C);
+//    C->add_transition('0', A);
+//    C->add_transition('1', C);
+//
+//    // Step 3: Build Transition Table (state IDs)
+//    std::vector<std::unordered_map<char, int>> transitionTable = {
+//            {{'0', 1}, {'1', 0}}, //C
+//            {{'0', 2}, {'1', 0}}, //A
+//            {{'0', 0}, {'1', 0}}  //B
+//    };
+//
+//    // Step 4: Define Alphabet
+//    std::set<char> alphabet = {'0', '1'};
+//
+//    // Step 5: Create DFA
+//    std::vector<State *> dfa = {A, B, C};
+//
+//    // Step 6: Minimize DFA
+//    MinimizeDFA minimizer;
+//    std::set<State *> minimized_dfa = minimizer.minDFA(dfa, transitionTable, alphabet);
+//
+//    // Step 7: Output Minimized DFA
+//    std::cout << "Minimized DFA States:\n";
+//    for (State *state : minimized_dfa) {
+//        state->print_state();
+//    }
+//
+//    // Clean up allocated memory
+//    delete A;
+//    delete B;
+//    delete C;
+      //test5
+    State *q1 = new State(0, false, "");
+    State *q2 = new State(1, false, "");
+    State *q4 = new State(2, false, "");
+    State *q5 = new State(3, false, "");
+    State *q3 = new State(4, true, "TOKEN");
     // Step 2: Define Transitions
-    q0->add_transition('a', q1);
-    q0->add_transition('b', q2);
-    q1->add_transition('a', q0);
-    q1->add_transition('b', q3);
-    q2->add_transition('a', q3);
-    q2->add_transition('b', q0);
-    q3->add_transition('a', q2);
-    q3->add_transition('b', q1);
+    q1->add_transition('0', q2);
+    q1->add_transition('1', q3);
+    q2->add_transition('0', q1);
+    q2->add_transition('1', q3);
+    q3->add_transition('0', q1);
+    q3->add_transition('1', q4);
+    q4->add_transition('0', q5);
+    q4->add_transition('1', q3);
+    q5->add_transition('0', q5);
+    q5->add_transition('1', q3);
 
     // Step 3: Build Transition Table (state IDs)
     std::vector<std::unordered_map<char, int>> transitionTable = {
-            {{'a', 1}, {'b', 2}}, // q0
-            {{'a', 0}, {'b', 3}}, // q1
-            {{'a', 3}, {'b', 0}}, // q2
-            {{'a', 2}, {'b', 1}}  // q3
+            {{'0', 1}, {'1', 4}}, //q1
+            {{'0', 0}, {'1', 4}}, //q2
+            {{'0', 3}, {'1', 4}}, //q4
+            {{'0', 3}, {'1', 4}}, //q5
+            {{'0', 0}, {'1', 2}}  //q3
     };
 
     // Step 4: Define Alphabet
-    std::set<char> alphabet = {'a', 'b'};
+    std::set<char> alphabet = {'0', '1'};
 
     // Step 5: Create DFA
-    std::vector<State *> dfa = {q0, q1, q2, q3};
+    std::vector<State *> dfa = {q1, q2, q3, q4, q5};
 
     // Step 6: Minimize DFA
     MinimizeDFA minimizer;
@@ -196,9 +333,10 @@ int main() {
     }
 
     // Clean up allocated memory
-    delete q0;
     delete q1;
     delete q2;
     delete q3;
+    delete q4;
+    delete q5;
     return 0;
 }
