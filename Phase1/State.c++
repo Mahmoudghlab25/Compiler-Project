@@ -25,8 +25,17 @@ bool State::is_accepting_state() const { return is_accepting; }
 // Get token type
 const std::string &State::get_token_type() const { return token_type; }
 
+void State::set_token(string token){token_type = token;}
+
 // Get ID
 int State::get_id() const { return id; }
+
+//Set id
+void State::set_id(int newId){id = newId;}
+// change acceptance
+void State::change_acceptance(bool newAcc){
+    is_accepting = newAcc;
+}
 
 // Overload the < operator for ordering
 bool State::operator<(const State &other) const

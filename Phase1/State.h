@@ -16,7 +16,7 @@ private:
 
 public:
     // Constructor
-    State(int id, bool is_accepting = false, const std::string &token_type = "");
+    State(int id, bool is_accepting, const std::string &token_type);
 
     // Add a transition
     void add_transition(char input, State *target);
@@ -30,8 +30,16 @@ public:
     // Get token type
     const std::string &get_token_type() const;
 
+    // set token type
+    void set_token(string token);
+
     // Get ID
     int get_id() const;
+
+    // Set ID
+    void set_id(int newId);
+    // change acceptance
+    void change_acceptance(bool newAcc);
 
     // Overload the < operator for ordering
     bool operator<(const State &other) const;
