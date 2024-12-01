@@ -1,8 +1,10 @@
 #include <iostream>
 #include <utility>
-#include <bits/stdc++.h>
 #include "State.h"
 #include "MinimizeDFA/MinimizeDFA.h"
+#include <unistd.h>
+#include "FileReader.cpp"
+#include "FileWriter.cpp"
 
 class LexicalAnalyzer {
 private:
@@ -59,11 +61,6 @@ public:
         return tokens;
     }
 
-    static void displayTokens(const std::vector<std::string> &tokens) {
-        for (const auto &token: tokens) {
-            std::cout << token << std::endl;
-        }
-    }
 };
 
 int main() {
@@ -159,10 +156,16 @@ int main() {
 //        state->print_state();
 //    }
 
-    std::vector<std::string> codeLines;
-    codeLines.emplace_back("doubdouble");
+    //Change it with your current path.
+    std::string path = R"(C:\Users\Mahmo\OneDrive - Alexandria University\Documents\GitHub\Compiler-Project\Phase1\Input\)";
+    FileReader fileReader(path + "lecture test.txt");
+    std::vector<std::string> codeLines = fileReader.readLines();
+
     LexicalAnalyzer lexicalAnalyzer(codeLines, dfa);
     std::vector<std::string> tks = lexicalAnalyzer.analyze();
-    LexicalAnalyzer::displayTokens(tks);
+
+    FileWriter fileWriter("lecture test");
+    fileWriter.writeLines(tks);
+
     return 0;
 }
