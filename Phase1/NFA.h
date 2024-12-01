@@ -23,6 +23,7 @@ private:
     State* finalState;                    // final state
     State* startState;                          // Start state
     vector <State*> all_state;
+    vector <State*> final_states;
 public:
     // Constructor
     NFA();
@@ -48,7 +49,12 @@ public:
     void add_state(State* state){all_state.push_back(state);}
     // get all states
     vector <State*> get_allState(){return all_state;}
-
+    // add final states
+    void add_final_state(State* state){final_states.push_back(state);}
+    // get all final states
+    vector <State*> get_allFinalStates(){return final_states;}
+    // Compine all states
+    NFA compine(map<string,NFA> nfas);
     // Display the NFA
     void display() const;
 

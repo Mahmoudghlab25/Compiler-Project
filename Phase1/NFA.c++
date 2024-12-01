@@ -177,6 +177,37 @@ NFA NFA::nfa_options(string input, string token){
 
 }
 
+// function to compine all NFA states---------
+NFA NFA::compine(map<string,NFA> nfas){
+    NFA result;
+    int offset = 1;
+    result.startState = new State(0,false,"");
+    result.add_state(result.startState);
+    map<string, NFA>::const_iterator it = nfas.cbegin();
+    result.stateCount +=1; 
+    while(it != nfas.cend()){
+       string pattern = it->first;
+       NFA nfa = it->second;
+       result.transitions.push_back({result.startState, nfa.startState, '\0'}); 
+       for(int i=0; i< nfa.all_state.size(); i++){
+         State* s = nfa.all_state[i];
+         s->set_id(s->get_id() + offset);
+         result.add_state(s);
+       }
+       // Copy transitions from the original NFA
+        for (const auto& trans : nfa.transitions) {
+            result.transitions.push_back({trans.from , trans.to , trans.symbol});
+        }
+        nfa.finalState->set_token(pattern);
+        nfa.finalState->change_acceptance(true);
+        result.add_final_state(nfa.finalState);
+        it++;
+        offset += nfa.stateCount;
+        result.stateCount += nfa.stateCount;
+    }
+    return result;
+}
+
 // Display the NFA
 void NFA::display() const {
     cout << "States: " << stateCount << endl;

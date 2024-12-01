@@ -81,5 +81,24 @@ int main(){
     // more complex
     // nfa6 = nfa6.Union(nfa3.Concatenate(nfa1.basic('g'),nfa2.nfa_sequence("abc","alpha")),nfa4.Closure(nfa5.nfa_options("def","alpha")));
     // nfa6.display();
+    nfa1 = nfa1.nfa_sequence("abc","alpha");
+    nfa2 = nfa2.nfa_options("123","int");
+    map<string, NFA> myMap = {
+        {"alpha", nfa1},
+        {"int", nfa2}
+    };
+    nfa3 = nfa3.compine(myMap);
+    cout << "States: " << nfa3.getStateCount() << endl;
+    cout << "Start State: " << nfa3.getStartState().get_id() << endl;
+    cout << "Final States: "<< endl;
+    vector<State*> v = nfa3.get_allFinalStates();
+    for(int i=0; i<v.size(); i++){
+        cout <<"id = "<<v[i]->get_id()<<endl;
+        cout<<"pattern = "<<v[i]->get_token_type()<<endl;
+    }
+    cout << "Transitions:" << endl;
+    for (const auto& trans : nfa3.getTransitions()) {
+        cout << trans.from->get_id() << " --" << (trans.symbol == '\0' ? "ε" : string(1, trans.symbol)) << "--> " << trans.to->get_id() << endl;
+    }
     return 0;
 }
