@@ -19,6 +19,17 @@ const std::map<char, std::set<State *>> &State::get_transitions() const {
 
 // Check if accepting state
 bool State::is_accepting_state() const { return is_accepting; }
+// Check if dead state
+bool State::is_dead_state() const {
+    if (this->is_accepting_state()) {
+        return false;
+    }
+    std::string tokenType = this->get_token_type();
+    if(tokenType.empty() || !(tokenType == "dead")){
+        return false;
+    }
+    return true;
+}
 
 // Get token type
 const std::string &State::get_token_type() const { return token_type; }

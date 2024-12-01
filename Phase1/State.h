@@ -29,7 +29,8 @@ public:
     };
     // Check if accepting state
     bool is_accepting_state() const;
-
+    // Check if dead state
+    bool is_dead_state() const;
     // Get token type
     const std::string &get_token_type() const;
 
