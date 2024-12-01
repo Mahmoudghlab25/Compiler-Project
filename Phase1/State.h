@@ -23,10 +23,14 @@ public:
 
     // Get transitions
     const std::map<char, std::set<State *>> &get_transitions() const;
-
+    // Set transitions
+    void set_transitions(const std::map<char, std::set<State *>> &new_transitions){
+        this->transitions = new_transitions;
+    };
     // Check if accepting state
     bool is_accepting_state() const;
-
+    // Check if dead state
+    bool is_dead_state() const;
     // Get token type
     const std::string &get_token_type() const;
 
