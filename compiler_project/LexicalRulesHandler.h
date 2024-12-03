@@ -2,16 +2,15 @@
 #pragma once
 #include "LexicalRulesCommon.h"
 #include "LexicalRuleParser.h"
+#include "NFA.h"
 
 
 class LexicalRulesHandler {
 private:
-	std::unordered_set<std::string> definedNames;
-	// definitions
-	std::unordered_map<std::string, std::string> definitions;
-	// expressions
-	std::unordered_map<std::string, std::string> expressions;
-	//std::unordered_map<int, vector<int>> ruleDependencyGraph;
+	std::unordered_set<std::string> allNames;
+	std::unordered_set<std::string> expNames;
+	std::unordered_map<std::string, std::string> statements;
+	std::map<std::string, NFA*> nfaMap;
 
 	// Adds the statement to its corresponding map
 	// If lhs already exists, new rhs is joined with the existing rhs by '|'
@@ -22,6 +21,7 @@ private:
 	);
 
 	std::vector<Token> parseRHS(const std::string& rhs);
+	NFA* generateNFA(const std::string& curr);
 
 
 public:
@@ -35,4 +35,5 @@ public:
 		Defined names are stored in a set.
 	*/
 	void extractStatements(const std::vector<std::string>& rules);
+	NFA* generateNFAs();
 };

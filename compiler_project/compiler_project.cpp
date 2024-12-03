@@ -1,19 +1,27 @@
 #include <iostream>
 #include "common.h"
 #include "LexicalRuleParser.h"
+#include "NFA.h"
 
 using namespace std;
 
 int main()
 {
-    string rhs = "abc";
+    /*string rhs = "abc";
     unordered_set<string> definedVars = { {"digit"} };
     auto parser = LexicalRuleParser(rhs, definedVars);
     auto tokens = parser.parse();
     for (auto& token : tokens) {
         cout << token.type << " " << token.value << endl;
-    }
+    }*/
 
-    /*::testing::InitGoogleTest();
-    return RUN_ALL_TESTS();*/
+    NFA n = NFA();
+    n = n.basic('@');
+
+    n.display();
+
+    cout << "********************************\n";
+
+    NFA clone = NFA(n);
+    clone.display();
 }

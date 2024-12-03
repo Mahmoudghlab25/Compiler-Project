@@ -28,6 +28,10 @@ private:
 public:
     // Constructor
     NFA();
+    // copy constructor
+    NFA(NFA& nfa);
+    // destructor
+   /* ~NFA();*/
 
     // Static method to create a basic NFA for a single character
     NFA basic(char symbol);
@@ -55,14 +59,14 @@ public:
     // get all final states
     vector <State*> get_allFinalStates() { return final_states; }
     // Compine all states
-    NFA combine(map<string, NFA> nfas);
+    NFA combine(map<string, NFA*> nfas);
     // Display the NFA
     void display() const;
 
     // Getters for transitions, start state, final states, and state count
     vector<Transition> getTransitions() const;
-    State getStartState() const;
-    State getFinalStates() const;
+    State* getStartState() const;
+    State* getFinalState() const;
     int getStateCount() const;
 };
 

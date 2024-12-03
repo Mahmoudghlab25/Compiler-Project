@@ -1,11 +1,68 @@
 ﻿#include "NFA.h"
 #include "State.h"
+#include "common.h"
 
 // Constructor
 NFA::NFA() : stateCount(0), startState(new State(0, false, "")) {}
 
+// copy constructor
+NFA::NFA(NFA& nfa) {
+    this->stateCount = nfa.stateCount;
+    unordered_map<State*, State*> originalToClone;
+    
+    // creating new objects (clone states)
+    for (State* originalState : nfa.get_allState()) {
+        State* clone = new State(
+            originalState->get_id(),
+            originalState->is_accepting_state(),
+            originalState->get_token_type()
+        );
+        originalToClone[originalState] = clone;
+        this->all_state.push_back(clone);
+    }
+
+    // set start state
+    
+    this->startState = originalToClone[nfa.getStartState()];
+
+    // set final state
+    this->finalState = originalToClone[nfa.getFinalState()];
+
+    // set accepting states
+    for (State* originalFinalState: nfa.get_allFinalStates()) {
+        this->final_states.push_back(originalToClone[originalFinalState]);
+    }
+
+    for (auto& transition : nfa.getTransitions()) {
+
+        // clone transition
+        Transition cloneTransition = {
+            originalToClone[transition.from],
+            originalToClone[transition.to],
+            transition.symbol
+        };
+        
+        // adding corresponding transition to transitions vector
+        this->transitions.push_back(cloneTransition);
+        
+        // adding transition to inner transitions map of cloneTransition.from
+        originalToClone[transition.from]->add_transition(
+            cloneTransition.symbol,
+            cloneTransition.to
+        );
+    }
+}
+
+// destructor
+//NFA::~NFA() {
+//    for (State* s : this->all_state) {
+//        delete s;
+//    }
+//}
+
 // Create a basic NFA for a single character
 NFA NFA::basic(char symbol) {
+    // NFA* nfa = new NFA();
     NFA nfa;
     nfa.stateCount = 2;  // Two states: start and end
     nfa.startState = new State(0, false, "");
@@ -13,6 +70,7 @@ NFA NFA::basic(char symbol) {
     nfa.add_state(nfa.startState);
     nfa.add_state(nfa.finalState);
     nfa.transitions.push_back({ nfa.startState, nfa.finalState, symbol });
+    nfa.startState->add_transition(symbol, nfa.finalState);
     return nfa;
 }
 
@@ -29,6 +87,8 @@ NFA NFA::Union(const NFA& nfa1, const NFA& nfa2) {
     // Add epsilon transitions from the new start state to the old start states
     result.transitions.push_back({ result.startState, nfa1.startState , '\0' });
     result.transitions.push_back({ result.startState, nfa2.startState , '\0' });
+    result.startState->add_transition('\0', nfa1.startState);
+    result.startState->add_transition('\0', nfa2.startState);
     for (int i = 0; i < nfa1.all_state.size(); i++) {
         State* s = nfa1.all_state[i];
         s->set_id(s->get_id() + 1);
@@ -55,15 +115,14 @@ NFA NFA::Union(const NFA& nfa1, const NFA& nfa2) {
     nfa1.finalState->change_acceptance(false);
     nfa2.finalState->change_acceptance(false);
     result.transitions.push_back({ nfa1.finalState,result.finalState, '\0' });
+    nfa1.finalState->add_transition('\0', result.finalState);
     result.transitions.push_back({ nfa2.finalState, result.finalState, '\0' });
+    nfa2.finalState->add_transition('\0', result.finalState);
     return result;
 }
 
 // Perform concatenation of two NFAs
 NFA NFA::Concatenate(const NFA& nfa1, const NFA& nfa2) {
-    for (int i = 0; i < nfa2.all_state.size(); i++) {
-        State* s = nfa1.all_state[i];
-    }
     NFA result;
     result.stateCount = nfa1.stateCount + nfa2.stateCount;
     result.startState = nfa1.startState;
@@ -79,7 +138,7 @@ NFA NFA::Concatenate(const NFA& nfa1, const NFA& nfa2) {
     }
     nfa1.finalState->change_acceptance(false);
     result.transitions.push_back({ nfa1.finalState, nfa2.startState , '\0' });
-
+    nfa1.finalState->add_transition('\0', nfa2.startState);
     for (int i = 0; i < nfa2.all_state.size(); i++) {
         State* s = nfa2.all_state[i];
         s->set_id(s->get_id() + offset);
@@ -104,8 +163,9 @@ NFA NFA::Closure(const NFA& nfa) {
     result.add_state(result.finalState);
     // Add epsilon transitions for the closure
     result.transitions.push_back({ result.startState, nfa.startState, '\0' });   // From new start to old start
+    result.startState->add_transition('\0', nfa.startState);
     result.transitions.push_back({ result.startState, result.finalState, '\0' });    // From new start to new final
-
+    result.startState->add_transition('\0', result.finalState);
     for (int i = 0; i < nfa.all_state.size(); i++) {
         State* s = nfa.all_state[i];
         s->set_id(s->get_id() + 1);
@@ -119,7 +179,10 @@ NFA NFA::Closure(const NFA& nfa) {
 
     // Add epsilon transitions from old final state to the old start state and new final state
     result.transitions.push_back({ nfa.finalState, nfa.startState , '\0' });
+    nfa.finalState->add_transition('\0', nfa.startState);
     result.transitions.push_back({ nfa.finalState, result.finalState, '\0' });
+    nfa.finalState->add_transition('\0', result.finalState);
+    nfa.finalState->change_acceptance(false);
     return result;
 }
 // Create the closure (star) of an NFA
@@ -132,7 +195,7 @@ NFA NFA::positive_closure(const NFA& nfa) {
     result.add_state(result.finalState);
     // Add epsilon transitions for the closure
     result.transitions.push_back({ result.startState, nfa.startState, '\0' });   // From new start to old start
-
+    result.startState->add_transition('\0', nfa.startState);
     for (int i = 0; i < nfa.all_state.size(); i++) {
         State* s = nfa.all_state[i];
         s->set_id(s->get_id() + 1);
@@ -146,7 +209,10 @@ NFA NFA::positive_closure(const NFA& nfa) {
 
     // Add epsilon transitions from old final state to the old start state and new final state
     result.transitions.push_back({ nfa.finalState, nfa.startState , '\0' });
+    nfa.finalState->add_transition('\0', nfa.startState);
     result.transitions.push_back({ nfa.finalState, result.finalState, '\0' });
+    nfa.finalState->add_transition('\0', result.finalState);
+    nfa.finalState->change_acceptance(false);
     return result;
 }
 
@@ -176,33 +242,34 @@ NFA NFA::nfa_options(string input, string token) {
 
 }
 
-// function to combine all NFA states---------
-NFA NFA::combine(map<string, NFA> nfas) {
+// function to compine all NFA states---------
+NFA NFA::combine(map<string, NFA*> nfas) {
     NFA result;
     int offset = 1;
     result.startState = new State(0, false, "");
     result.add_state(result.startState);
-    map<string, NFA>::const_iterator it = nfas.cbegin();
+    map<string, NFA*>::iterator it = nfas.begin();
     result.stateCount += 1;
-    while (it != nfas.cend()) {
+    while (it != nfas.end()) {
         string pattern = it->first;
-        NFA nfa = it->second;
-        result.transitions.push_back({ result.startState, nfa.startState, '\0' });
-        for (int i = 0; i < nfa.all_state.size(); i++) {
-            State* s = nfa.all_state[i];
+        NFA* nfa = it->second;
+        result.transitions.push_back({ result.startState, nfa->startState, '\0' });
+        result.startState->add_transition('\0', nfa->startState);
+        for (int i = 0; i < nfa->all_state.size(); i++) {
+            State* s = nfa->all_state[i];
             s->set_id(s->get_id() + offset);
             result.add_state(s);
         }
         // Copy transitions from the original NFA
-        for (const auto& trans : nfa.transitions) {
+        for (const auto& trans : nfa->transitions) {
             result.transitions.push_back({ trans.from , trans.to , trans.symbol });
         }
-        nfa.finalState->set_token(pattern);
-        nfa.finalState->change_acceptance(true);
-        result.add_final_state(nfa.finalState);
+        nfa->finalState->set_token(pattern);
+        nfa->finalState->change_acceptance(true);
+        result.add_final_state(nfa->finalState);
         it++;
-        offset += nfa.stateCount;
-        result.stateCount += nfa.stateCount;
+        offset += nfa->stateCount;
+        result.stateCount += nfa->stateCount;
     }
     return result;
 }
@@ -224,12 +291,12 @@ vector<Transition> NFA::getTransitions() const {
     return transitions;
 }
 
-State NFA::getStartState() const {
-    return *startState;
+State* NFA::getStartState() const {
+    return startState;
 }
 
-State NFA::getFinalStates() const {
-    return *finalState;
+State* NFA::getFinalState() const {
+    return finalState;
 }
 
 int NFA::getStateCount() const {

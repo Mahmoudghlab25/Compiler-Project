@@ -25,8 +25,7 @@ typedef enum TokenType {
 	OPERATION,
 	LITERAL,
 	DEFINED_VAR,
-	PAREN,
-	END
+	PAREN
 } TokenType;
 
 typedef struct Token {
@@ -43,6 +42,8 @@ extern std::unordered_set<char> specialSymbols;
 extern std::unordered_map<std::string, std::string> escapeSeqMap;
 
 extern std::unordered_set<char> validEscapeCharacters;
+
+extern std::string seqString;
 
 bool isLiteral(char c);
 bool isSequenceOperand(char c);

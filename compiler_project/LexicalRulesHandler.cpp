@@ -102,13 +102,12 @@ void LexicalRulesHandler::extractStatements(const vector<string>& rules) {
 			throw runtime_error("Invalid RHS at rule " + (i + 1));
 		}
 
-		definedNames.insert(lhs);
+		allNames.insert(lhs);
 
-		if (op[0] == EQUAL) {
-			addStatement(definitions, lhs, rhs);
-		}
-		else {
-			addStatement(expressions, lhs, rhs);
+		addStatement(statements, lhs, rhs);
+
+		if (op[0] == COLON) {
+			expNames.insert(lhs);
 		}
 	}
 }
@@ -121,4 +120,134 @@ vector<Token> LexicalRulesHandler::parseRHS(const string& rhs) {
 
 	// skip whitespaces
 	return vector<Token>{};
+}
+
+NFA* LexicalRulesHandler::generateNFA(const string& curr) {
+	if (nfaMap.find(curr) != nfaMap.end()) {
+		// if found, copy then return
+		return new NFA(*nfaMap[curr]);
+	}
+	// else calculate, store in map, copy and return
+	auto parser = LexicalRuleParser(statements.at(curr), allNames);
+	vector<Token> tokens = parser.parse();
+	stack<NFA*> stack;
+	for (Token& token : tokens) {
+		if (token.type == OPERATION) {
+			switch (token.value[0]) {
+				NFA* op1, * op2, * op, * res, temp = NFA();
+
+			case UNION:
+				if (stack.empty()) {
+					throw runtime_error("Union operation missing 1st operand");
+				}
+				op1 = stack.top();
+				stack.pop();
+				if (stack.empty()) {
+					throw runtime_error("Union operation missing 2nd operand");
+				}
+				op2 = stack.top();
+				stack.pop();
+				res = new NFA();
+				temp = res->Union(*op1, *op2);
+				res = &(temp);
+				stack.push(res);
+				break;
+			case CONCATENATION:
+				if (stack.empty()) {
+					throw runtime_error("Concat operation missing 1st operand");
+				}
+				op1 = stack.top();
+				stack.pop();
+				if (stack.empty()) {
+					throw runtime_error("Concat operation missing 2nd operand");
+				}
+				op2 = stack.top();
+				stack.pop();
+				res = new NFA();
+				res = &(res->Concatenate(*op1, *op2));
+				stack.push(res);
+				break;
+			case KLEENE_CLOSURE:
+				if (stack.empty()) {
+					throw runtime_error("Kleene closure operation missing 1st operand");
+				}
+				op = stack.top();
+				stack.pop();
+				res = new NFA();
+				res = &(res->Closure(*op));
+				stack.push(res);
+				break;
+			case POSITIVE_CLOSURE:
+				if (stack.empty()) {
+					throw runtime_error("Positive closure operation missing 1st operand");
+				}
+				op = stack.top();
+				stack.pop();
+				res = new NFA();
+				res = &(res->positive_closure(*op));
+				stack.push(res);
+				break;
+			case SEQUENCE:
+				if (stack.empty()) {
+					throw runtime_error("Concat operation missing 1st operand");
+				}
+				
+				op1 = stack.top();
+				stack.pop();
+				char symbol1 = op1->getTransitions()[0].symbol;
+				if (stack.empty()) {
+					throw runtime_error("Concat operation missing 2nd operand");
+				}
+				
+				op2 = stack.top();
+				stack.pop();
+				char symbol2 = op2->getTransitions()[0].symbol;
+
+				//a-9 not handled
+				string seq = seqString.substr(seqString.find(symbol1), 
+					seqString.find(symbol2));
+
+				//"a..z"
+				res = new NFA();
+				res = &(res->nfa_sequence(seq, curr));
+				stack.push(res);
+				break;
+			}
+		}
+		else if (token.type == LITERAL) {
+			if (token.value.size() == 1) {
+				NFA* n = new NFA();
+				n = &(n->basic(token.value[0]));
+				stack.push(n);
+			}
+			else {
+				NFA* n = new NFA();
+				n = &(n->nfa_sequence(token.value, curr));
+				stack.push(n);
+			}
+		}
+		else {
+			NFA* definedVarNFA = generateNFA(token.value);
+			stack.push(definedVarNFA);
+		}
+	}
+	// store nfa of curr in map
+	NFA* res = stack.top();
+	stack.pop();
+	if (!stack.empty()) {
+		throw runtime_error("error while parsing rhs [stack not empty]");
+	}
+	nfaMap[curr] = res;
+	return res;
+}
+
+NFA* LexicalRulesHandler::generateNFAs() {
+	for (auto& p : statements) {
+		if (nfaMap.find(p.first) == nfaMap.end()) {
+			nfaMap[p.first] = generateNFA(p.first);
+		}
+	}
+	NFA* res = new NFA();
+	res = &(res->combine(nfaMap));
+	return res;
 }

@@ -8,6 +8,13 @@ std::unordered_map<char, int> opPrecedence{
 	{SEQUENCE, 3},
 };
 
+// "a..zA..Z0..9"
+// string(0, 25) a..z
+// string(26, 51) A..Z
+// string(52, 61) 0..9
+
+std::string seqString = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+
 std::unordered_set<char> specialSymbols = {
 	'-', '+', '*', '|', '(', ')', '\\'
 };
