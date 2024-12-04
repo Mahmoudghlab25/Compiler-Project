@@ -1,13 +1,13 @@
 #include <iostream>
-#include "common.h"
-#include "LexicalRuleParser.h"
 #include "LexicalRulesHandler.h"
 #include "NFA.h"
+#include "DFAConverter.h"
+#include "MinimizeDFA/MinimizeDFA.h"
+#include "LexicalAnalyzer.cpp"
 
 using namespace std;
 
-int main()
-{
+int main() {
     string rhs = "a-z";
     // never pass an rvalue to an lvalue reference
     //auto parser = LexicalRuleParser(rhs, definedVars);
@@ -59,10 +59,52 @@ int main()
 
 
     LexicalRulesHandler handler;
-    auto rules = handler.readRules("rules.txt");
+    auto rules = handler.readRules(
+            R"(C:\Users\Mahmo\OneDrive - Alexandria University\Documents\GitHub\Compiler-Project\Phase1\rules.txt)");
     rules.pop_back();
+
     handler.extractStatements(rules);
+
     handler.extractKeywords(rules);
+
     handler.extractPunctuation(rules);
-    handler.generateNFAs()->display();
+
+//    handler.generateNFAs()->display();
+    cout << "---------------------------------------------------" << endl << "DFA:" << endl;
+    NFAtoDFAConverter nfAtoDfaConverter(*(handler.generateNFAs()));
+    nfAtoDfaConverter.create_DFA();
+//    vector<unordered_map<char, int>> trTable = nfAtoDfaConverter.get_dfa_transition_table();
+//    int i = 0;
+//    for (const auto &table: trTable) {
+//        cout << "table index:" << i << endl;
+//        i++;
+//        for (auto pair: table) {
+//            cout << "symbol: " << pair.first << " state id:" << pair.second << endl;
+//        }
+//    }
+    vector<State *> states = nfAtoDfaConverter.get_dfa_states();
+    for (const auto &state: states) {
+        state->print_state();
+    }
+    cout << "Number of DFA states: " << states.size() << endl;
+    cout << "---------------------------------------------------" << endl << "MinDFA:" << endl;
+    MinimizeDFA minDFA;
+//    set<char> alphabets = {'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z',
+//                           'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z',
+//                           '0','1','2','3','4','5','6','7','8','9',
+//                           '+','}','{','=',';','<','>','!','(',')','*',',','-','/','.'};
+    set<State *> minStates = minDFA.minDFA(states, nfAtoDfaConverter.get_dfa_transition_table());
+    for (auto st: minStates) {
+        st->print_state();
+    }
+    cout << "Number of min DFA states: "<<minStates.size() << endl;
+    cout << "--------------------------------------------------" << endl << "Minimized Transition Table:" << endl;
+//    map<int, std::unordered_map<char, int>> minTransitionTable = MinimizeDFA::getReducedTransitionTable(minStates);
+//    for (const auto &stTable: minTransitionTable) {
+//        cout << "State number " << stTable.first << endl;
+//        for (auto pair: stTable.second) {
+//            cout << "character: " << pair.first << ", Target state id: " << pair.second << endl;
+//        }
+//    }
+
 }

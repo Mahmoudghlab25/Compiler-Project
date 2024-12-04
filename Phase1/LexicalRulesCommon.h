@@ -4,36 +4,36 @@
 #include "common.h"
 
 typedef enum Symbol {
-	SEQUENCE = '-',
-	POSITIVE_CLOSURE = '+',
-	KLEENE_CLOSURE = '*',
-	CONCATENATION = '.',
-	UNION = '|',
-	LEFT_PAREN = '(',
-	RIGHT_PAREN = ')',
-	ESCAPE = '\\',
-	LEFT_SQUARE = '[',
-	RIGHT_SQUARE = ']',
-	LEFT_CURLY = '{',
-	RIGHT_CURLY = '}',
-	EQUAL = '=',
-	COLON = ':'
+    SEQUENCE = '-',
+    POSITIVE_CLOSURE = '+',
+    KLEENE_CLOSURE = '*',
+    CONCATENATION = '.',
+    UNION = '|',
+    LEFT_PAREN = '(',
+    RIGHT_PAREN = ')',
+    ESCAPE = '\\',
+    LEFT_SQUARE = '[',
+    RIGHT_SQUARE = ']',
+    LEFT_CURLY = '{',
+    RIGHT_CURLY = '}',
+    EQUAL = '=',
+    COLON = ':'
 } Symbol;
 
 
 typedef enum TokenType {
-	OPERATION,
-	LITERAL,
-	DEFINED_VAR,
-	PAREN
+    OPERATION,
+    LITERAL,
+    DEFINED_VAR,
+    PAREN
 } TokenType;
 
 typedef struct Token {
-	TokenType type;
-	const std::string value;
-	Token(TokenType type, const std::string& value);
+    TokenType type;
+    const std::string value;
+    Token(TokenType type, const std::string& value);
 
-	bool operator==(const Token& other) const;
+    bool operator==(const Token& other) const;
 } Token;
 
 extern std::unordered_map<char, int> opPrecedence;

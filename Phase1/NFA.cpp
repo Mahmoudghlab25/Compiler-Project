@@ -9,20 +9,20 @@ NFA::NFA() : stateCount(0), startState(new State(0, false, "")) {}
 NFA::NFA(NFA& nfa) {
     this->stateCount = nfa.stateCount;
     unordered_map<State*, State*> originalToClone;
-    
+
     // creating new objects (clone states)
     for (State* originalState : nfa.get_allState()) {
         State* clone = new State(
-            originalState->get_id(),
-            originalState->is_accepting_state(),
-            originalState->get_token_type()
+                originalState->get_id(),
+                originalState->is_accepting_state(),
+                originalState->get_token_type()
         );
         originalToClone[originalState] = clone;
         this->all_state.push_back(clone);
     }
 
     // set start state
-    
+
     this->startState = originalToClone[nfa.getStartState()];
 
     // set final state
@@ -37,18 +37,18 @@ NFA::NFA(NFA& nfa) {
 
         // clone transition
         Transition cloneTransition = {
-            originalToClone[transition.from],
-            originalToClone[transition.to],
-            transition.symbol
+                originalToClone[transition.from],
+                originalToClone[transition.to],
+                transition.symbol
         };
-        
+
         // adding corresponding transition to transitions vector
         this->transitions.push_back(cloneTransition);
-        
+
         // adding transition to inner transitions map of cloneTransition.from
         originalToClone[transition.from]->add_transition(
-            cloneTransition.symbol,
-            cloneTransition.to
+                cloneTransition.symbol,
+                cloneTransition.to
         );
     }
 }

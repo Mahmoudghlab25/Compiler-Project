@@ -12,9 +12,8 @@
 class MinimizeDFA {
 public:
     std::set<State *> minDFA(std::vector<State *> dfa,
-                                const std::vector<std::unordered_map<char, int>> &transitionTable,
-                                const std::set<char> &alphabet);
-
+                                const std::vector<std::unordered_map<char, int>> &transitionTable);
+    static std::map<int, std::unordered_map<char, int>> getReducedTransitionTable(std::set<State *> minDFA);
 private:
     // Helper function to find the index of the group containing a state
     static int find_group(const std::vector<std::set<State *>> &groups, State *state) {

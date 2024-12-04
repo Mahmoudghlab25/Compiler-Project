@@ -1,6 +1,5 @@
 #include <iostream>
-#include <utility>
-#include <bits/stdc++.h>
+#include "common.h"
 
 using namespace std;
 
@@ -33,7 +32,7 @@ public:
     }
 
     void printLines(vector<string>& codeLines) {
-        for (const auto& line: codeLines) {
+        for (const auto& line : codeLines) {
             cout << line << endl;
         }
     }

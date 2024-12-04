@@ -33,10 +33,15 @@ public:
     bool is_dead_state() const;
     // Get token type
     const std::string &get_token_type() const;
+    // set token type
+    void set_token(std::string token);
 
     // Get ID
     int get_id() const;
-
+    // Set ID
+    void set_id(int newId);
+    // change acceptance
+    void change_acceptance(bool newAcc);
     // Overload the < operator for ordering
     bool operator<(const State &other) const;
 

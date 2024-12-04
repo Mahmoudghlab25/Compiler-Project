@@ -1,4 +1,3 @@
-#pragma once
 #ifndef NFA_H
 #define NFA_H
 
@@ -31,7 +30,7 @@ public:
     // copy constructor
     NFA(NFA& nfa);
     // destructor
-   /* ~NFA();*/
+    /* ~NFA();*/
 
     // Static method to create a basic NFA for a single character
     NFA* basic(char symbol);
