@@ -1,8 +1,10 @@
 #include <iostream>
 #include <utility>
-#include <bits/stdc++.h>
 #include "State.h"
 #include "MinimizeDFA/MinimizeDFA.h"
+#include <unistd.h>
+#include "FileReader.cpp"
+#include "FileWriter.cpp"
 
 class LexicalAnalyzer {
 private:
@@ -27,9 +29,14 @@ public:
         for (auto &codeline: this->codelines) {
             while (true) {
                 if (currentState->is_dead_state()) {
-                    tokens.push_back(token);
+                    if(!token.empty()){
+                        tokens.push_back(token);
+                        codeline = codeline.substr(prevAccToken.size());
+                    } else{
+                        tokens.emplace_back("Error");
+                        codeline = codeline.substr(1);
+                    }
                     currentState = *(this->states.begin());
-                    codeline = codeline.substr(prevAccToken.size());
                     token = "";
                     currentAccToken = "";
                     prevAccToken = "";
@@ -59,17 +66,12 @@ public:
         return tokens;
     }
 
-    static void displayTokens(const std::vector<std::string> &tokens) {
-        for (const auto &token: tokens) {
-            std::cout << token << std::endl;
-        }
-    }
 };
 
 int main() {
     State *q01411 = new State(0, false, "");
-    State *q2512 = new State(1, true, "id");
-    State *q12 = new State(2, true, "id");
+    State *q2512 = new State(1, false, "");
+//    State *q12 = new State(2, true, "id");
     State *q36 = new State(3, true, "do");
     State *q7 = new State(4, false, "");
     State *q8 = new State(5, false, "");
@@ -78,12 +80,12 @@ int main() {
     State *qdead = new State(8, false, "dead");
 
     q01411->add_transition('d', q2512);
-    q01411->add_transition('a', q12);
-    q01411->add_transition('o', q12);
-    q01411->add_transition('u', q12);
-    q01411->add_transition('b', q12);
-    q01411->add_transition('l', q12);
-    q01411->add_transition('e', q12);
+    q01411->add_transition('a', qdead);
+    q01411->add_transition('o', qdead);
+    q01411->add_transition('u', qdead);
+    q01411->add_transition('b', qdead);
+    q01411->add_transition('l', qdead);
+    q01411->add_transition('e', qdead);
 
     q2512->add_transition('a', qdead);
     q2512->add_transition('d', qdead);
@@ -93,13 +95,13 @@ int main() {
     q2512->add_transition('l', qdead);
     q2512->add_transition('e', qdead);
 
-    q12->add_transition('a', qdead);
-    q12->add_transition('d', qdead);
-    q12->add_transition('o', qdead);
-    q12->add_transition('u', qdead);
-    q12->add_transition('b', qdead);
-    q12->add_transition('l', qdead);
-    q12->add_transition('e', qdead);
+//    q12->add_transition('a', qdead);
+//    q12->add_transition('d', qdead);
+//    q12->add_transition('o', qdead);
+//    q12->add_transition('u', qdead);
+//    q12->add_transition('b', qdead);
+//    q12->add_transition('l', qdead);
+//    q12->add_transition('e', qdead);
 
     q36->add_transition('a', qdead);
     q36->add_transition('d', qdead);
@@ -150,7 +152,7 @@ int main() {
     qdead->add_transition('e', qdead);
 
     std::set<char> alphabet = {'a', 'd', 'o', 'u', 'b', 'l', 'e'};
-    std::set<State *> dfa = {q01411, q2512, q12, q36, q7, q8, q9, q10, qdead};
+    std::set<State *> dfa = {q01411, q2512, q36, q7, q8, q9, q10, qdead};
     std::vector<std::unordered_map<char, int>> transitionTable = {};
 //    MinimizeDFA minimizer;
 //    std::set<State *> minimized_dfa = minimizer.minDFA(dfa, transitionTable, alphabet);
@@ -159,10 +161,24 @@ int main() {
 //        state->print_state();
 //    }
 
-    std::vector<std::string> codeLines;
-    codeLines.emplace_back("doubdouble");
+    //Change it with your current path.
+    std::string path = R"(C:\Users\Mahmo\OneDrive - Alexandria University\Documents\GitHub\Compiler-Project\Phase1\Input\)";
+    FileReader fileReader(path + "lecture test.txt");
+    std::vector<std::string> codeLines = fileReader.readLines();
+
     LexicalAnalyzer lexicalAnalyzer(codeLines, dfa);
     std::vector<std::string> tks = lexicalAnalyzer.analyze();
-    LexicalAnalyzer::displayTokens(tks);
+
+    FileWriter fileWriter("lecture test");
+    fileWriter.writeLines(tks);
+
+    delete(q01411);
+    delete(q2512);
+    delete(q36);
+    delete(q7);
+    delete(q8);
+    delete(q9);
+    delete(q10);
+    delete(qdead);
     return 0;
 }
