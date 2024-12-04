@@ -42,7 +42,8 @@ bool State::operator<(const State& other) const
 // For Debugging: Print State Info
 void State::print_state() const
 {
-    std::cout << "State ID: " << id << (is_accepting ? " (Accepting)" : "") << "\n";
+    std::cout << "State ID: " << id << (is_accepting ? " (Accepting)" : "") 
+        << ((is_accepting) ? get_token_type() : "") << "\n";
     for (const auto& [input, targets] : transitions)
     {
         std::cout << "  On '" << input << "' -> { ";

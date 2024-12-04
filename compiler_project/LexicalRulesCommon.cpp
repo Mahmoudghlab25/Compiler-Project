@@ -51,3 +51,7 @@ bool isSequenceOperand(char c) {
 		('a' <= c && c <= 'z') ||
 		('A' <= c && c <= 'Z');
 }
+
+bool Token::operator==(const Token& other) const {
+	return type == other.type && value == other.value;
+}

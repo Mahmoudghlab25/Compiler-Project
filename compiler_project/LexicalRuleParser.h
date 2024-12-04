@@ -9,8 +9,8 @@ private:
 	std::unordered_map<std::string, int> matchMap;
 	std::string stringBuffer;
 	std::stack<char> opStack;
-	//bool isPossiblyMatchingDefinedName;
 
+	void populateMatchMap(const std::unordered_set<std::string>& definedNames);
 	// resets matchMap and stringBuffer
 	void resetStringParsing();
 
@@ -31,20 +31,20 @@ private:
 	// Throws error if not found.
 	void closeParen(std::vector<Token>& output);
 
-	void throwSyntaxError(int i);
+	void throwSyntaxError(size_t i);
 
-	void handleClosure(int i, std::vector<Token>& output);
-	void handleUnion(int i, std::vector<Token>& output);
-	void handleLeftParen(int i, std::vector<Token>& output);
-	void handleRightParen(int i, std::vector<Token>& output);
+	void handleClosure(size_t i, std::vector<Token>& output);
+	void handleUnion(size_t i, std::vector<Token>& output);
+	void handleLeftParen(size_t i, std::vector<Token>& output);
+	void handleRightParen(size_t i, std::vector<Token>& output);
 	void appendRecognizedSequence(std::vector<Token>& output);
-	void handleInnerLiteral(int i, std::vector<Token>& output);
-	void handleSequenceOpening(int i, std::vector<Token>& output);
-	void handleSequenceClosing(int i, std::vector<Token>& output);
-	void handleLastLiteral(int i, std::vector<Token>& output);
-	void handleLiteral(int i, std::vector<Token>& output);
-	void handleEscapeCharacter(int i, std::vector<Token>& output);
-	void handleSequenceCharacter(int i, std::vector<Token>& output);
+	void handleInnerLiteral(size_t i, std::vector<Token>& output);
+	void handleSequenceOpening(size_t i, std::vector<Token>& output);
+	void handleSequenceClosing(size_t i, std::vector<Token>& output);
+	void handleLastLiteral(size_t i, std::vector<Token>& output);
+	void handleLiteral(size_t i, std::vector<Token>& output);
+	void handleEscapeCharacter(size_t i, std::vector<Token>& output);
+	void handleSequenceCharacter(size_t i, std::vector<Token>& output);
 
 public:
 	LexicalRuleParser(

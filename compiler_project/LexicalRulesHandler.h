@@ -10,6 +10,8 @@ private:
 	std::unordered_set<std::string> allNames;
 	std::unordered_set<std::string> expNames;
 	std::unordered_map<std::string, std::string> statements;
+	std::unordered_set<std::string> keyWords;
+	std::unordered_set<std::string> punctuation;
 	std::map<std::string, NFA*> nfaMap;
 
 	// Adds the statement to its corresponding map
@@ -22,6 +24,7 @@ private:
 
 	std::vector<Token> parseRHS(const std::string& rhs);
 	NFA* generateNFA(const std::string& curr);
+	NFA* generateNFAForPunctuation(const std::string& punc);
 
 
 public:
@@ -35,5 +38,8 @@ public:
 		Defined names are stored in a set.
 	*/
 	void extractStatements(const std::vector<std::string>& rules);
+	void extractKeywords(const std::vector<std::string>& rules);
+	void extractPunctuation(const std::vector<std::string>& rules);
+	std::vector<std::string> readRules(const char* fileName);
 	NFA* generateNFAs();
 };

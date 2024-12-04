@@ -34,32 +34,32 @@ public:
    /* ~NFA();*/
 
     // Static method to create a basic NFA for a single character
-    NFA basic(char symbol);
+    NFA* basic(char symbol);
 
     // Static method to perform union of two NFAs
-    NFA Union(const NFA& nfa1, const NFA& nfa2);
+    NFA* Union(const NFA& nfa1, const NFA& nfa2);
 
     // Static method to perform concatenation of two NFAs
-    NFA Concatenate(const NFA& nfa1, const NFA& nfa2);
+    NFA* Concatenate(const NFA& nfa1, const NFA& nfa2);
 
     // Static method to create the closure (Kleene star) of an NFA
-    NFA Closure(const NFA& nfa);
+    NFA* Closure(const NFA& nfa);
 
     // Static method to create the closure (positive) of an NFA
-    NFA positive_closure(const NFA& nfa);
+    NFA* positive_closure(const NFA& nfa);
 
-    NFA nfa_sequence(string input, string token_type);
-    NFA nfa_options(string input, string token_type);
+    NFA* nfa_sequence(string input, string token_type);
+    NFA* nfa_options(string input, string token_type);
     // add states
     void add_state(State* state) { all_state.push_back(state); }
     // get all states
-    vector <State*> get_allState() { return all_state; }
+    vector <State*> get_allState() const { return all_state; }
     // add final states
     void add_final_state(State* state) { final_states.push_back(state); }
     // get all final states
     vector <State*> get_allFinalStates() { return final_states; }
     // Compine all states
-    NFA combine(map<string, NFA*> nfas);
+    NFA* combine(map<string, NFA*> nfas);
     // Display the NFA
     void display() const;
 

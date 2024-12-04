@@ -23,7 +23,7 @@ string trim(string& s) {
 
 vector<string> splitOnce(const string& s, char splitChar, char splitCharAlt) {
 	int i = 0;
-	char separator;
+	char separator = 0;
 	while (i < s.size()) {
 		if (s[i] == splitChar || s[i] == splitCharAlt) { break; }
 		i++;
@@ -33,13 +33,13 @@ vector<string> splitOnce(const string& s, char splitChar, char splitCharAlt) {
 	if (i == 0) {
 		// op, RHS, no LHS
 		return vector<string> {
-			string(), separator + "", string(s, i + 1)
+			string(), string(1, separator), string(s, i + 1)
 		};
 	}
 	else if (i == s.size() - 1) {
 		// LHS, op, no RHS
 		return vector<string> {
-			string(s, 0, i - 1), separator + "", string()
+			string(s, 0, i - 1), string(1, separator), string()
 		};
 	}
 	else if (i == s.size()) {
@@ -50,8 +50,24 @@ vector<string> splitOnce(const string& s, char splitChar, char splitCharAlt) {
 	}
 
 	return vector<string> {
-		string(s, 0, i - 1), string(s, i + 1)
+		string(s, 0, i), string(1, separator), string(s, i + 1)
 	};
+}
+
+vector<string> LexicalRulesHandler::readRules(const char* fileName) {
+	vector<string> lines;
+	ifstream file(fileName);
+	
+	while (true) {
+		string line;
+		if (!getline(file, line)) {
+			lines.push_back(line);
+			break;
+		}
+		lines.push_back(line);
+	}
+
+	return lines;
 }
 
 bool checkValidLHS(const string& lhs) {
@@ -112,6 +128,40 @@ void LexicalRulesHandler::extractStatements(const vector<string>& rules) {
 	}
 }
 
+void LexicalRulesHandler::extractKeywords(const vector<string>& rules) {
+	for (int i = 0; i < rules.size(); i++) {
+		// removing any leading/trailing whitespaces
+		// TODO: do that after reading from file
+		//rule = trim(rule);
+		// assuming rules are trimmed
+
+		if (rules[i][0] != LEFT_CURLY) { continue; }
+		string rule(rules[i], 1, rules[i].size() - 2);
+		istringstream stream(rule);
+		string keyword;
+		while (stream >> keyword) {
+			keyWords.insert(keyword);
+		}
+	}
+}
+
+void LexicalRulesHandler::extractPunctuation(const vector<string>& rules) {
+	for (int i = 0; i < rules.size(); i++) {
+		// removing any leading/trailing whitespaces
+		// TODO: do that after reading from file
+		//rule = trim(rule);
+		// assuming rules are trimmed
+
+		if (rules[i][0] != LEFT_SQUARE) { continue; }
+		string rule(rules[i], 1, rules[i].size() - 2);
+		istringstream stream(rule);
+		string punc;
+		while (stream >> punc) {
+			punctuation.insert(punc);
+		}
+	}
+}
+
 vector<Token> LexicalRulesHandler::parseRHS(const string& rhs) {
 	int curr = 0, next = 1;
 	std::stack<Token> opStack;
@@ -120,6 +170,13 @@ vector<Token> LexicalRulesHandler::parseRHS(const string& rhs) {
 
 	// skip whitespaces
 	return vector<Token>{};
+}
+
+NFA* LexicalRulesHandler::generateNFAForPunctuation(const string& punc) {
+	auto parser = LexicalRuleParser(punc, allNames);
+	auto puncToken = parser.parse()[0];
+	NFA* n = new NFA();
+	return n->basic(puncToken.value[0]);
 }
 
 NFA* LexicalRulesHandler::generateNFA(const string& curr) {
@@ -134,38 +191,35 @@ NFA* LexicalRulesHandler::generateNFA(const string& curr) {
 	for (Token& token : tokens) {
 		if (token.type == OPERATION) {
 			switch (token.value[0]) {
-				NFA* op1, * op2, * op, * res, temp = NFA();
+				NFA* op1, * op2, * op, * res, *temp;
 
 			case UNION:
 				if (stack.empty()) {
 					throw runtime_error("Union operation missing 1st operand");
 				}
-				op1 = stack.top();
+				op2 = stack.top();
 				stack.pop();
 				if (stack.empty()) {
 					throw runtime_error("Union operation missing 2nd operand");
 				}
-				op2 = stack.top();
+				op1 = stack.top();
 				stack.pop();
 				res = new NFA();
-				temp = res->Union(*op1, *op2);
-				res = &(temp);
-				stack.push(res);
+				stack.push(res->Union(*op1, *op2));
 				break;
 			case CONCATENATION:
 				if (stack.empty()) {
 					throw runtime_error("Concat operation missing 1st operand");
 				}
-				op1 = stack.top();
+				op2 = stack.top();
 				stack.pop();
 				if (stack.empty()) {
 					throw runtime_error("Concat operation missing 2nd operand");
 				}
-				op2 = stack.top();
+				op1 = stack.top();
 				stack.pop();
 				res = new NFA();
-				res = &(res->Concatenate(*op1, *op2));
-				stack.push(res);
+				stack.push(res->Concatenate(*op1, *op2));
 				break;
 			case KLEENE_CLOSURE:
 				if (stack.empty()) {
@@ -174,8 +228,7 @@ NFA* LexicalRulesHandler::generateNFA(const string& curr) {
 				op = stack.top();
 				stack.pop();
 				res = new NFA();
-				res = &(res->Closure(*op));
-				stack.push(res);
+				stack.push(res->Closure(*op));
 				break;
 			case POSITIVE_CLOSURE:
 				if (stack.empty()) {
@@ -184,46 +237,46 @@ NFA* LexicalRulesHandler::generateNFA(const string& curr) {
 				op = stack.top();
 				stack.pop();
 				res = new NFA();
-				res = &(res->positive_closure(*op));
-				stack.push(res);
+				stack.push(res->positive_closure(*op));
 				break;
 			case SEQUENCE:
 				if (stack.empty()) {
 					throw runtime_error("Concat operation missing 1st operand");
 				}
 				
-				op1 = stack.top();
+				op2 = stack.top();
 				stack.pop();
-				char symbol1 = op1->getTransitions()[0].symbol;
+				char symbol2 = op2->getTransitions()[0].symbol;
 				if (stack.empty()) {
 					throw runtime_error("Concat operation missing 2nd operand");
 				}
 				
-				op2 = stack.top();
+				op1 = stack.top();
 				stack.pop();
-				char symbol2 = op2->getTransitions()[0].symbol;
+				char symbol1 = op1->getTransitions()[0].symbol;
 
 				//a-9 not handled
-				string seq = seqString.substr(seqString.find(symbol1), 
-					seqString.find(symbol2));
+				auto start = seqString.find(symbol1);
+				auto end = seqString.find(symbol2);
+				string seq = seqString.substr(
+					start, 
+					end - start + 1
+				);
 
 				//"a..z"
 				res = new NFA();
-				res = &(res->nfa_sequence(seq, curr));
-				stack.push(res);
+				stack.push(res->nfa_options(seq, curr));
 				break;
 			}
 		}
 		else if (token.type == LITERAL) {
 			if (token.value.size() == 1) {
 				NFA* n = new NFA();
-				n = &(n->basic(token.value[0]));
-				stack.push(n);
+				stack.push(n->basic(token.value[0]));
 			}
 			else {
 				NFA* n = new NFA();
-				n = &(n->nfa_sequence(token.value, curr));
-				stack.push(n);
+				stack.push(n->nfa_sequence(token.value, curr));
 			}
 		}
 		else {
@@ -242,12 +295,30 @@ NFA* LexicalRulesHandler::generateNFA(const string& curr) {
 }
 
 NFA* LexicalRulesHandler::generateNFAs() {
+
 	for (auto& p : statements) {
 		if (nfaMap.find(p.first) == nfaMap.end()) {
 			nfaMap[p.first] = generateNFA(p.first);
 		}
 	}
+
+	// remove definitions, not needed anymore
+	for (auto& [var, _] : nfaMap) {
+		if (expNames.find(var) == expNames.end()) {
+			nfaMap.erase(var);
+		}
+	}
+
+	// loop on keywords, punc --> nfa
+	for (auto& keyword : keyWords) {
+		NFA* nfa = new NFA();
+		nfaMap[keyword] = nfa->nfa_sequence(keyword, keyword);
+	}
+
+	for (auto& punc : punctuation) {
+		nfaMap[punc] = generateNFAForPunctuation(punc);
+	}
+
 	NFA* res = new NFA();
-	res = &(res->combine(nfaMap));
-	return res;
+	return res->combine(nfaMap);
 }

@@ -2,22 +2,26 @@
 
 using namespace std;
 
-LexicalRuleParser::LexicalRuleParser(
-	const string& rhs,
-	const unordered_set<string>& definedNames
-) : rhs(rhs), matchMap(), stringBuffer(), opStack() {
-
+void LexicalRuleParser
+::populateMatchMap(const unordered_set<string>& definedNames) {
 	// generate matchMap from defined names
 	for (auto i = definedNames.begin(); i != definedNames.end(); ++i) {
-		matchMap[*i] = -1;
+		matchMap[*i] = 0;
 	}
 	vector<string> specialSequences = {
 		"\\L", "\\+", "\\*", "\\-", "\\(", "\\)", "\\\\", "\\|",
 		"\\{", "\\}", "\\[", "\\]"
 	};
 	for (auto& s : specialSequences) {
-		matchMap[s] = -1;
+		matchMap[s] = 0;
 	}
+}
+
+LexicalRuleParser::LexicalRuleParser(
+	const string& rhs,
+	const unordered_set<string>& definedNames
+) : rhs(rhs), matchMap(), stringBuffer(), opStack() {
+	populateMatchMap(definedNames);
 }
 
 void LexicalRuleParser::resetStringParsing() {
@@ -102,7 +106,7 @@ void LexicalRuleParser::closeParen(vector<Token>& output) {
 	}
 }
 
-void LexicalRuleParser::throwSyntaxError(int i) {
+void LexicalRuleParser::throwSyntaxError(size_t i) {
 	if (i + 1 < rhs.size()) {
 		throw runtime_error("Syntax error: "
 			+ string(1, rhs[i]) + " then " + rhs[i + 1]);
@@ -113,7 +117,7 @@ void LexicalRuleParser::throwSyntaxError(int i) {
 	}
 }
 
-void LexicalRuleParser::handleClosure(int i, vector<Token>& output) {
+void LexicalRuleParser::handleClosure(size_t i, vector<Token>& output) {
 	if (i + 1 == rhs.size() ||
 		rhs[i + 1] == UNION ||
 		rhs[i + 1] == RIGHT_PAREN)
@@ -133,7 +137,7 @@ void LexicalRuleParser::handleClosure(int i, vector<Token>& output) {
 	}
 }
 
-void LexicalRuleParser::handleUnion(int i, vector<Token>& output) {
+void LexicalRuleParser::handleUnion(size_t i, vector<Token>& output) {
 	if (i + 1 < rhs.size() &&
 		(isLiteral(rhs[i + 1]) ||
 			rhs[i + 1] == LEFT_PAREN ||
@@ -146,10 +150,11 @@ void LexicalRuleParser::handleUnion(int i, vector<Token>& output) {
 	}
 }
 
-void LexicalRuleParser::handleLeftParen(int i, vector<Token>& output) {
+void LexicalRuleParser::handleLeftParen(size_t i, vector<Token>& output) {
 	if (i + 1 < rhs.size() &&
 		(isLiteral(rhs[i + 1]) ||
-			rhs[i + 1] == ESCAPE))
+			rhs[i + 1] == ESCAPE || 
+			rhs[i + 1] == LEFT_PAREN))
 	{
 		pushToStack(rhs[i], output);
 	}
@@ -158,13 +163,14 @@ void LexicalRuleParser::handleLeftParen(int i, vector<Token>& output) {
 	}
 }
 
-void LexicalRuleParser::handleRightParen(int i, vector<Token>& output) {
+void LexicalRuleParser::handleRightParen(size_t i, vector<Token>& output) {
 	if (i + 1 < rhs.size() && rhs[i + 1] == SEQUENCE) {
 		throwSyntaxError(i);
 	}
 	else if (i + 1 < rhs.size() &&
 		(isLiteral(rhs[i + 1]) ||
-			rhs[i + 1] == ESCAPE))
+			rhs[i + 1] == ESCAPE) || 
+			rhs[i + 1] == LEFT_PAREN)
 	{
 		closeParen(output);
 		pushToStack(CONCATENATION, output);
@@ -185,7 +191,7 @@ void LexicalRuleParser::appendRecognizedSequence(vector<Token>& output) {
 	}
 }
 
-void LexicalRuleParser::handleInnerLiteral(int i, vector<Token>& output) {
+void LexicalRuleParser::handleInnerLiteral(size_t i, vector<Token>& output) {
 
 	// handle sequence closing
 	if (!opStack.empty() && opStack.top() == SEQUENCE) {
@@ -218,7 +224,7 @@ void LexicalRuleParser::handleInnerLiteral(int i, vector<Token>& output) {
 	updateMatches(rhs[i]);
 }
 
-void LexicalRuleParser::handleSequenceOpening(int i, vector<Token>& output) {
+void LexicalRuleParser::handleSequenceOpening(size_t i, vector<Token>& output) {
 
 	// guaranteed that next = -
 
@@ -233,10 +239,10 @@ void LexicalRuleParser::handleSequenceOpening(int i, vector<Token>& output) {
 
 	// here: empty stringBuffer guaranteed.
 	// just add the current char as a literal
-	output.push_back(Token(LITERAL, rhs[i] + ""));
+	output.push_back(Token(LITERAL, string(1, rhs[i])));
 }
 
-void LexicalRuleParser::handleSequenceClosing(int i, vector<Token>& output) {
+void LexicalRuleParser::handleSequenceClosing(size_t i, vector<Token>& output) {
 	bool validClosing = isSequenceOperand(rhs[i]) &&
 		(i + 1 == rhs.size() || i + 1 < rhs.size() &&
 			(rhs[i + 1] == UNION || rhs[i + 1] == RIGHT_PAREN));
@@ -247,10 +253,10 @@ void LexicalRuleParser::handleSequenceClosing(int i, vector<Token>& output) {
 
 	// here: empty stringBuffer guaranteed.
 	// just add the current char as a literal
-	output.push_back(Token(LITERAL, rhs[i] + ""));
+	output.push_back(Token(LITERAL, string(1, rhs[i])));
 }
 
-void LexicalRuleParser::handleLastLiteral(int i, vector<Token>& output) {
+void LexicalRuleParser::handleLastLiteral(size_t i, vector<Token>& output) {
 
 	// handle sequence opening
 	if (i + 1 < rhs.size() &&
@@ -301,7 +307,7 @@ void LexicalRuleParser::handleLastLiteral(int i, vector<Token>& output) {
 	}
 }
 
-void LexicalRuleParser::handleLiteral(int i, vector<Token>& output) {
+void LexicalRuleParser::handleLiteral(size_t i, vector<Token>& output) {
 	if (i + 1 < rhs.size() && isLiteral(rhs[i + 1])) {
 		handleInnerLiteral(i, output);
 	}
@@ -310,7 +316,7 @@ void LexicalRuleParser::handleLiteral(int i, vector<Token>& output) {
 	}
 }
 
-void LexicalRuleParser::handleEscapeCharacter(int i, vector<Token>& output) {
+void LexicalRuleParser::handleEscapeCharacter(size_t i, vector<Token>& output) {
 	if (i + 1 < rhs.size() &&
 		validEscapeCharacters.find(rhs[i + 1]) != validEscapeCharacters.end())
 	{
@@ -321,7 +327,7 @@ void LexicalRuleParser::handleEscapeCharacter(int i, vector<Token>& output) {
 	}
 }
 
-void LexicalRuleParser::handleSequenceCharacter(int i, vector<Token>& output) {
+void LexicalRuleParser::handleSequenceCharacter(size_t i, vector<Token>& output) {
 	if (i + 1 < rhs.size() && isSequenceOperand(rhs[i + 1])) {
 		pushToStack(rhs[i], output);
 	}
@@ -335,8 +341,11 @@ vector<Token> LexicalRuleParser::parse() {
 
 	for (int i = 0; i < rhs.size(); i++) {
 
-		if (rhs[i] == POSITIVE_CLOSURE
-			|| rhs[i] == KLEENE_CLOSURE)
+		if (isLiteral(rhs[i]) || stringBuffer == "\\") {
+			handleLiteral(i, output);
+		}
+		else if ((rhs[i] == POSITIVE_CLOSURE
+			|| rhs[i] == KLEENE_CLOSURE))
 		{
 			handleClosure(i, output);
 		}
@@ -348,9 +357,6 @@ vector<Token> LexicalRuleParser::parse() {
 		}
 		else if (rhs[i] == RIGHT_PAREN) {
 			handleRightParen(i, output);
-		}
-		else if (isLiteral(rhs[i])) {
-			handleLiteral(i, output);
 		}
 		else if (rhs[i] == ESCAPE) {
 			handleEscapeCharacter(i, output);

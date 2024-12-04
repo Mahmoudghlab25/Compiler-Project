@@ -32,6 +32,8 @@ typedef struct Token {
 	TokenType type;
 	const std::string value;
 	Token(TokenType type, const std::string& value);
+
+	bool operator==(const Token& other) const;
 } Token;
 
 extern std::unordered_map<char, int> opPrecedence;
