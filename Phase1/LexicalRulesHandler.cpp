@@ -173,8 +173,19 @@ vector<Token> LexicalRulesHandler::parseRHS(const string& rhs) {
 NFA* LexicalRulesHandler::generateNFAForPunctuation(const string& punc) {
     auto parser = LexicalRuleParser(punc, allNames);
     auto puncToken = parser.parse()[0];
+    addToAlphabet(puncToken.value);
     NFA* n = new NFA();
     return n->basic(puncToken.value[0]);
+}
+
+void LexicalRulesHandler::addToAlphabet(char c) {
+    alphabet.insert(c);
+}
+
+void LexicalRulesHandler::addToAlphabet(const string& val) {
+    for (const char c : val) {
+        alphabet.insert(c);
+    }
 }
 
 NFA* LexicalRulesHandler::generateNFA(const string& curr) {
@@ -260,7 +271,7 @@ NFA* LexicalRulesHandler::generateNFA(const string& curr) {
                             start,
                             end - start + 1
                     );
-
+                    addToAlphabet(seq);
                     //"a..z"
                     res = new NFA();
                     stack.push(res->nfa_options(seq, curr));
@@ -269,10 +280,12 @@ NFA* LexicalRulesHandler::generateNFA(const string& curr) {
         }
         else if (token.type == LITERAL) {
             if (token.value.size() == 1) {
+                addToAlphabet(token.value[0]);
                 NFA* n = new NFA();
                 stack.push(n->basic(token.value[0]));
             }
             else {
+                addToAlphabet(token.value);
                 NFA* n = new NFA();
                 stack.push(n->nfa_sequence(token.value, curr));
             }
@@ -313,6 +326,7 @@ NFA* LexicalRulesHandler::generateNFAs() {
 
     // loop on keywords, punc --> nfa
     for (auto& keyword : keyWords) {
+        addToAlphabet(keyword);
         NFA* nfa = new NFA();
         nfaMap[keyword] = nfa->nfa_sequence(keyword, keyword);
     }
@@ -323,4 +337,8 @@ NFA* LexicalRulesHandler::generateNFAs() {
 
     NFA* res = new NFA();
     return res->combine(nfaMap);
+}
+
+set<char> LexicalRulesHandler::getAlphabet() {
+    return alphabet;
 }

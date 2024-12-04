@@ -13,6 +13,7 @@ private:
     std::unordered_set<std::string> keyWords;
     std::unordered_set<std::string> punctuation;
     std::map<std::string, NFA*> nfaMap;
+    std::set<char> alphabet;
 
     // Adds the statement to its corresponding map
     // If lhs already exists, new rhs is joined with the existing rhs by '|'
@@ -25,6 +26,8 @@ private:
     std::vector<Token> parseRHS(const std::string& rhs);
     NFA* generateNFA(const std::string& curr);
     NFA* generateNFAForPunctuation(const std::string& punc);
+    void addToAlphabet(char c);
+    void addToAlphabet(const std::string& val);
 
 
 public:
@@ -42,4 +45,5 @@ public:
     void extractPunctuation(const std::vector<std::string>& rules);
     std::vector<std::string> readRules(const char* fileName);
     NFA* generateNFAs();
+    std::set<char> getAlphabet();
 };
