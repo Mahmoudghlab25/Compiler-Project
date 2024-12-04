@@ -15,9 +15,10 @@ private:
     std::vector<std::unordered_map<char, int>> dfa_transition_table;
     std::vector<State *> dfa_states;
     State *start_state;
+    set<char> inputs;
 
 public:
-    NFAtoDFAConverter(NFA nfa);
+    NFAtoDFAConverter(NFA nfa, set<char> inputs);
 
     void create_DFA();
 

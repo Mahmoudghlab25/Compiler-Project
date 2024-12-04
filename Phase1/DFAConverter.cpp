@@ -5,7 +5,7 @@
 #include "DFAConverter.h"
 using namespace std;
 
-NFAtoDFAConverter::NFAtoDFAConverter(NFA nfa) : nfa(nfa) {}
+NFAtoDFAConverter::NFAtoDFAConverter(NFA nfa, set<char> inputs) : nfa(nfa), inputs(inputs) {}
 
 void NFAtoDFAConverter::create_DFA()
 {
@@ -98,6 +98,18 @@ void NFAtoDFAConverter::create_DFA()
             set<State *> target_closure = e_closure(target_subset);
             int target_id = subset_to_state_map[target_closure];
             dfa_transition_table[current_dfa_id][input] = target_id;
+        }
+    }
+    State *dead_state = new State(id, false, "dead");
+    for (auto state : dfa_states)
+    {
+        map<char, set<State *>> transitions = state->get_transitions();
+        for (auto input : inputs)
+        {
+            if (transitions.find(input) == transitions.end())
+            {
+                state->add_transition(input, dead_state);
+            }
         }
     }
 }
