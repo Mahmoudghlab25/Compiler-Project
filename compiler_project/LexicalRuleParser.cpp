@@ -10,7 +10,7 @@ void LexicalRuleParser
 	}
 	vector<string> specialSequences = {
 		"\\L", "\\+", "\\*", "\\-", "\\(", "\\)", "\\\\", "\\|",
-		"\\{", "\\}", "\\[", "\\]"
+		"\\{", "\\}", "\\[", "\\]", "\\=", "\\:"
 	};
 	for (auto& s : specialSequences) {
 		matchMap[s] = 0;
@@ -76,7 +76,7 @@ bool LexicalRuleParser::completeMatchExists() {
 	return false;
 }
 
-void LexicalRuleParser::pushToStack(char op, vector<Token>& output) {
+void LexicalRuleParser::pushToStack(char op) {
 
 	if (op == LEFT_PAREN) {
 		opStack.push(op);
@@ -92,7 +92,7 @@ void LexicalRuleParser::pushToStack(char op, vector<Token>& output) {
 	opStack.push(op);
 }
 
-void LexicalRuleParser::closeParen(vector<Token>& output) {
+void LexicalRuleParser::closeParen() {
 	while (true) {
 		if (opStack.empty()) {
 			throw runtime_error("Invalid rule: extra closing parenthesis.");
@@ -117,53 +117,53 @@ void LexicalRuleParser::throwSyntaxError(size_t i) {
 	}
 }
 
-void LexicalRuleParser::handleClosure(size_t i, vector<Token>& output) {
+void LexicalRuleParser::handleClosure(size_t i) {
 	if (i + 1 == rhs.size() ||
 		rhs[i + 1] == UNION ||
 		rhs[i + 1] == RIGHT_PAREN)
 	{
 		// next = <end>
-		pushToStack(rhs[i], output);
+		pushToStack(rhs[i]);
 	}
 	else if (isLiteral(rhs[i + 1]) ||
 		rhs[i + 1] == LEFT_PAREN ||
 		rhs[i + 1] == ESCAPE)
 	{
-		pushToStack(rhs[i], output);
-		pushToStack(CONCATENATION, output);
+		pushToStack(rhs[i]);
+		pushToStack(CONCATENATION);
 	}
 	else {
 		throwSyntaxError(i);
 	}
 }
 
-void LexicalRuleParser::handleUnion(size_t i, vector<Token>& output) {
+void LexicalRuleParser::handleUnion(size_t i) {
 	if (i + 1 < rhs.size() &&
 		(isLiteral(rhs[i + 1]) ||
 			rhs[i + 1] == LEFT_PAREN ||
 			rhs[i + 1] == ESCAPE))
 	{
-		pushToStack(rhs[i], output);
+		pushToStack(rhs[i]);
 	}
 	else {
 		throwSyntaxError(i);
 	}
 }
 
-void LexicalRuleParser::handleLeftParen(size_t i, vector<Token>& output) {
+void LexicalRuleParser::handleLeftParen(size_t i) {
 	if (i + 1 < rhs.size() &&
 		(isLiteral(rhs[i + 1]) ||
 			rhs[i + 1] == ESCAPE || 
 			rhs[i + 1] == LEFT_PAREN))
 	{
-		pushToStack(rhs[i], output);
+		pushToStack(rhs[i]);
 	}
 	else {
 		throwSyntaxError(i);
 	}
 }
 
-void LexicalRuleParser::handleRightParen(size_t i, vector<Token>& output) {
+void LexicalRuleParser::handleRightParen(size_t i) {
 	if (i + 1 < rhs.size() && rhs[i + 1] == SEQUENCE) {
 		throwSyntaxError(i);
 	}
@@ -172,15 +172,15 @@ void LexicalRuleParser::handleRightParen(size_t i, vector<Token>& output) {
 			rhs[i + 1] == ESCAPE) || 
 			rhs[i + 1] == LEFT_PAREN)
 	{
-		closeParen(output);
-		pushToStack(CONCATENATION, output);
+		closeParen();
+		pushToStack(CONCATENATION);
 	}
 	else {
-		closeParen(output);
+		closeParen();
 	}
 }
 
-void LexicalRuleParser::appendRecognizedSequence(vector<Token>& output) {
+void LexicalRuleParser::appendRecognizedSequence() {
 	if (escapeSeqMap.find(stringBuffer) != escapeSeqMap.end()) {
 		// push the escape sequence
 		output.push_back(Token(LITERAL, escapeSeqMap[stringBuffer]));
@@ -191,11 +191,11 @@ void LexicalRuleParser::appendRecognizedSequence(vector<Token>& output) {
 	}
 }
 
-void LexicalRuleParser::handleInnerLiteral(size_t i, vector<Token>& output) {
+void LexicalRuleParser::handleInnerLiteral(size_t i) {
 
 	// handle sequence closing
 	if (!opStack.empty() && opStack.top() == SEQUENCE) {
-		handleSequenceClosing(i, output);
+		handleSequenceClosing(i);
 		return;
 	}
 
@@ -204,8 +204,8 @@ void LexicalRuleParser::handleInnerLiteral(size_t i, vector<Token>& output) {
 	// Append stringBuffer
 	if (checkMatchReset(rhs[i]) && completeMatchExists()) {
 		// concat op for the next literal
-		pushToStack(CONCATENATION, output);
-		appendRecognizedSequence(output);
+		pushToStack(CONCATENATION);
+		appendRecognizedSequence();
 		// reset stringBuffer and matchMap
 		resetStringParsing();
 	}
@@ -214,7 +214,7 @@ void LexicalRuleParser::handleInnerLiteral(size_t i, vector<Token>& output) {
 	// Append stringBuffer
 	else if (checkMatchReset(rhs[i]) && !stringBuffer.empty()) {
 		// concat op for the next literal
-		pushToStack(CONCATENATION, output);
+		pushToStack(CONCATENATION);
 		// add the current value of stringBuffer, if any
 		output.push_back(Token(LITERAL, stringBuffer));
 		resetStringParsing();
@@ -224,7 +224,7 @@ void LexicalRuleParser::handleInnerLiteral(size_t i, vector<Token>& output) {
 	updateMatches(rhs[i]);
 }
 
-void LexicalRuleParser::handleSequenceOpening(size_t i, vector<Token>& output) {
+void LexicalRuleParser::handleSequenceOpening(size_t i) {
 
 	// guaranteed that next = -
 
@@ -242,7 +242,7 @@ void LexicalRuleParser::handleSequenceOpening(size_t i, vector<Token>& output) {
 	output.push_back(Token(LITERAL, string(1, rhs[i])));
 }
 
-void LexicalRuleParser::handleSequenceClosing(size_t i, vector<Token>& output) {
+void LexicalRuleParser::handleSequenceClosing(size_t i) {
 	bool validClosing = isSequenceOperand(rhs[i]) &&
 		(i + 1 == rhs.size() || i + 1 < rhs.size() &&
 			(rhs[i + 1] == UNION || rhs[i + 1] == RIGHT_PAREN));
@@ -256,13 +256,13 @@ void LexicalRuleParser::handleSequenceClosing(size_t i, vector<Token>& output) {
 	output.push_back(Token(LITERAL, string(1, rhs[i])));
 }
 
-void LexicalRuleParser::handleLastLiteral(size_t i, vector<Token>& output) {
+void LexicalRuleParser::handleLastLiteral(size_t i) {
 
 	// handle sequence opening
 	if (i + 1 < rhs.size() &&
 		rhs[i + 1] == SEQUENCE)
 	{
-		handleSequenceOpening(i, output);
+		handleSequenceOpening(i);
 		return;
 	}
 
@@ -270,20 +270,20 @@ void LexicalRuleParser::handleLastLiteral(size_t i, vector<Token>& output) {
 	// if not then append stringBuffer
 	if (checkMatchReset(rhs[i]) && completeMatchExists()) {
 		if (i + 1 < rhs.size() && rhs[i + 1] == LEFT_PAREN) {
-			pushToStack(CONCATENATION, output);
+			pushToStack(CONCATENATION);
 		}
-		appendRecognizedSequence(output);
+		appendRecognizedSequence();
 		resetStringParsing();
 		// then process curr char
 		output.push_back(Token(LITERAL, string(1, rhs[i])));
 	}
 	// current char still cannot be added, but no complete matches exist
 	else if (checkMatchReset(rhs[i]) && !stringBuffer.empty()) {
-		pushToStack(CONCATENATION, output);
+		pushToStack(CONCATENATION);
 		output.push_back(Token(LITERAL, stringBuffer));
 		resetStringParsing();
 		if (i + 1 < rhs.size() && rhs[i + 1] == LEFT_PAREN) {
-			pushToStack(CONCATENATION, output);
+			pushToStack(CONCATENATION);
 		}
 		// then process curr char
 		output.push_back(Token(LITERAL, string(1, rhs[i])));
@@ -294,12 +294,15 @@ void LexicalRuleParser::handleLastLiteral(size_t i, vector<Token>& output) {
 		stringBuffer += rhs[i];
 		updateMatches(rhs[i]);
 		if (completeMatchExists()) {
-			appendRecognizedSequence(output);
+			if (i + 1 < rhs.size() && rhs[i + 1] == LEFT_PAREN) {
+				pushToStack(CONCATENATION);
+			}
+			appendRecognizedSequence();
 			resetStringParsing();
 		}
 		else {
 			if (i + 1 < rhs.size() && rhs[i + 1] == LEFT_PAREN) {
-				pushToStack(CONCATENATION, output);
+				pushToStack(CONCATENATION);
 			}
 			output.push_back(Token(LITERAL, stringBuffer));
 			resetStringParsing();
@@ -307,29 +310,29 @@ void LexicalRuleParser::handleLastLiteral(size_t i, vector<Token>& output) {
 	}
 }
 
-void LexicalRuleParser::handleLiteral(size_t i, vector<Token>& output) {
-	if (i + 1 < rhs.size() && isLiteral(rhs[i + 1])) {
-		handleInnerLiteral(i, output);
+void LexicalRuleParser::handleLiteral(size_t i) {
+	if (i + 1 < rhs.size() && (isLiteral(rhs[i + 1]) || rhs[i + 1] == ESCAPE)) {
+		handleInnerLiteral(i);
 	}
 	else {
-		handleLastLiteral(i, output);
+		handleLastLiteral(i);
 	}
 }
 
-void LexicalRuleParser::handleEscapeCharacter(size_t i, vector<Token>& output) {
+void LexicalRuleParser::handleEscapeCharacter(size_t i) {
 	if (i + 1 < rhs.size() &&
 		validEscapeCharacters.find(rhs[i + 1]) != validEscapeCharacters.end())
 	{
-		handleInnerLiteral(i, output);
+		handleInnerLiteral(i);
 	}
 	else {
 		throwSyntaxError(i);
 	}
 }
 
-void LexicalRuleParser::handleSequenceCharacter(size_t i, vector<Token>& output) {
+void LexicalRuleParser::handleSequenceCharacter(size_t i) {
 	if (i + 1 < rhs.size() && isSequenceOperand(rhs[i + 1])) {
-		pushToStack(rhs[i], output);
+		pushToStack(rhs[i]);
 	}
 	else {
 		throwSyntaxError(i);
@@ -337,37 +340,34 @@ void LexicalRuleParser::handleSequenceCharacter(size_t i, vector<Token>& output)
 }
 
 vector<Token> LexicalRuleParser::parse() {
-	vector<Token> output;
 
 	for (int i = 0; i < rhs.size(); i++) {
 
 		if (isLiteral(rhs[i]) || stringBuffer == "\\") {
-			handleLiteral(i, output);
+			handleLiteral(i);
 		}
 		else if ((rhs[i] == POSITIVE_CLOSURE
 			|| rhs[i] == KLEENE_CLOSURE))
 		{
-			handleClosure(i, output);
+			handleClosure(i);
 		}
 		else if (rhs[i] == UNION) {
-			handleUnion(i, output);
+			handleUnion(i);
 		}
 		else if (rhs[i] == LEFT_PAREN) {
-			handleLeftParen(i, output);
+			handleLeftParen(i);
 		}
 		else if (rhs[i] == RIGHT_PAREN) {
-			handleRightParen(i, output);
+			handleRightParen(i);
 		}
 		else if (rhs[i] == ESCAPE) {
-			handleEscapeCharacter(i, output);
+			handleEscapeCharacter(i);
 		}
 		else if (rhs[i] == SEQUENCE) {
-			handleSequenceCharacter(i, output);
+			handleSequenceCharacter(i);
 		}
 		//ignore whitespace
 	}
-
-	// TODO: flush stack
 
 	while (!opStack.empty()) {
 		output.push_back(Token(OPERATION, string(1, opStack.top())));

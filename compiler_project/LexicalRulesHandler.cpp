@@ -61,6 +61,7 @@ vector<string> LexicalRulesHandler::readRules(const char* fileName) {
 	while (true) {
 		string line;
 		if (!getline(file, line)) {
+			line = trim(line);
 			lines.push_back(line);
 			break;
 		}
@@ -95,16 +96,13 @@ void LexicalRulesHandler::extractStatements(const vector<string>& rules) {
 
 
 	for (int i = 0; i < rules.size(); i++) {
-		// removing any leading/trailing whitespaces
-		// TODO: do that after reading from file
-		//rule = trim(rule);
 		// assuming rules are trimmed
 		if (rules[i][0] == LEFT_CURLY || rules[i][0] == LEFT_SQUARE) { continue; }
 		vector<string> splittedRule = splitOnce(rules[i], EQUAL, COLON);
 
-		const string& lhs = splittedRule[0];
-		const string& op = splittedRule[1];
-		const string& rhs = splittedRule[2];
+		const string& lhs = trim(splittedRule[0]);
+		const string& op = trim(splittedRule[1]);
+		const string& rhs = trim(splittedRule[2]);
 
 		if (!checkValidLHS(lhs)) {
 			throw runtime_error("Invalid LHS at rule " + (i + 1));
@@ -290,7 +288,7 @@ NFA* LexicalRulesHandler::generateNFA(const string& curr) {
 	if (!stack.empty()) {
 		throw runtime_error("error while parsing rhs [stack not empty]");
 	}
-	nfaMap[curr] = res;
+	/*nfaMap[curr] = res;*/
 	return res;
 }
 
@@ -303,10 +301,14 @@ NFA* LexicalRulesHandler::generateNFAs() {
 	}
 
 	// remove definitions, not needed anymore
+	vector<string> unneeded;
 	for (auto& [var, _] : nfaMap) {
 		if (expNames.find(var) == expNames.end()) {
-			nfaMap.erase(var);
+			unneeded.push_back(var);
 		}
+	}
+	for (const string& var : unneeded) {
+		nfaMap.erase(var);
 	}
 
 	// loop on keywords, punc --> nfa

@@ -31,11 +31,13 @@ std::unordered_map<std::string, std::string> escapeSeqMap = {
 	{"\\{", "{"},
 	{"\\}", "}"},
 	{"\\[", "["},
-	{"\\]", "]"}
+	{"\\]", "]"},
+	{"\\=", "="},
+	{"\\:", ":"}
 };
 
 std::unordered_set<char> validEscapeCharacters = {
-	'L', '-', '+', '*', '|', '(', ')', '\\', '[', ']', '{', '}'
+	'L', '-', '+', '*', '|', '(', ')', '\\', '[', ']', '{', '}', '=', ':'
 };
 
 Token::Token(TokenType type, const std::string& value) :
