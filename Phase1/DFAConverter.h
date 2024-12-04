@@ -5,13 +5,7 @@
 #include <utility>
 #include <bits/stdc++.h>
 #include "State.h"
-
-class NFA
-{
-public:
-    std::set<State> all_states;
-    State *start_state;
-};
+#include "NFA.h"
 
 class NFAtoDFAConverter
 {

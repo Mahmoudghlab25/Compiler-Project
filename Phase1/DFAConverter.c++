@@ -12,7 +12,7 @@ void NFAtoDFAConverter::create_DFA()
     queue<set<State *>> unprocessed_subsets;
     int id = 0;
 
-    State *nfa_start_state = nfa.start_state;
+    State *nfa_start_state = nfa.getStartState();
     set<State *> nfa_start_set;
 
     nfa_start_set.insert(nfa_start_state);
