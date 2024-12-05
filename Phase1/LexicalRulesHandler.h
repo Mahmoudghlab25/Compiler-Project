@@ -13,6 +13,7 @@ private:
     std::unordered_set<std::string> keyWords;
     std::unordered_set<std::string> punctuation;
     std::map<std::string, NFA*> nfaMap;
+    std::vector<std::string> order;
     std::set<char> alphabet;
 
     // Adds the statement to its corresponding map

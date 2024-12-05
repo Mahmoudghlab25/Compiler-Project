@@ -58,7 +58,7 @@ public:
     // get all final states
     vector <State*> get_allFinalStates() { return final_states; }
     // Compine all states
-    NFA* combine(map<string, NFA*> nfas);
+    NFA* NFA::combine(map<string, NFA*> nfas, vector<string> &order);
     // Display the NFA
     void display() const;
 

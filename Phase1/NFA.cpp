@@ -1,7 +1,7 @@
 ﻿#include "NFA.h"
 #include "State.h"
 #include "common.h"
-
+#include "State.cpp"
 // Constructor
 NFA::NFA() : stateCount(0), startState(new State(0, false, "")) {}
 
@@ -241,16 +241,16 @@ NFA* NFA::nfa_options(string input, string token) {
 }
 
 // function to compine all NFA states---------
-NFA* NFA::combine(map<string, NFA*> nfas) {
+NFA* NFA::combine(map<string, NFA*> nfas, vector<string> &order) {
     NFA* result = new NFA();
     int offset = 1;
     result->startState = new State(0, false, "");
     result->add_state(result->startState);
-    map<string, NFA*>::iterator it = nfas.begin();
     result->stateCount += 1;
-    while (it != nfas.end()) {
-        string pattern = it->first;
-        NFA* nfa = it->second;
+    for(int i=0; i<order.size(); i++) {
+        
+        string pattern = order[i];
+        NFA* nfa = nfas[order[ i]];
         result->transitions.push_back({ result->startState, nfa->startState, '\0' });
         result->startState->add_transition('\0', nfa->startState);
         for (int i = 0; i < nfa->all_state.size(); i++) {
@@ -265,7 +265,6 @@ NFA* NFA::combine(map<string, NFA*> nfas) {
         nfa->finalState->set_token(pattern);
         nfa->finalState->change_acceptance(true);
         result->add_final_state(nfa->finalState);
-        it++;
         offset += nfa->stateCount;
         result->stateCount += nfa->stateCount;
     }

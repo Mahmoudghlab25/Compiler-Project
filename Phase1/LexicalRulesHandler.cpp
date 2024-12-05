@@ -1,5 +1,8 @@
 #include "LexicalRulesHandler.h"
-
+#include "LexicalRulesCommon.h"
+#include "LexicalRulesCommon.cpp"
+#include "NFA.h"
+#include "NFA.cpp"
 using namespace std;
 
 string trim(string& s) {
@@ -117,12 +120,13 @@ void LexicalRulesHandler::extractStatements(const vector<string>& rules) {
         }
 
         allNames.insert(lhs);
-
+        order.push_back(lhs);
         addStatement(statements, lhs, rhs);
 
         if (op[0] == COLON) {
             expNames.insert(lhs);
         }
+
     }
 }
 
@@ -140,6 +144,7 @@ void LexicalRulesHandler::extractKeywords(const vector<string>& rules) {
         while (stream >> keyword) {
             keyWords.insert(keyword);
         }
+        order.push_back(keyword);
     }
 }
 
@@ -157,6 +162,7 @@ void LexicalRulesHandler::extractPunctuation(const vector<string>& rules) {
         while (stream >> punc) {
             punctuation.insert(punc);
         }
+        order.push_back(punc);
     }
 }
 
@@ -336,7 +342,7 @@ NFA* LexicalRulesHandler::generateNFAs() {
     }
 
     NFA* res = new NFA();
-    return res->combine(nfaMap);
+    return res->combine(nfaMap, order);
 }
 
 set<char> LexicalRulesHandler::getAlphabet() {
