@@ -1,1 +1,12 @@
-var:a|b
+{boolean int float}
+letter = a-z|A-Z
+digit = 0-9
+xthisss: letter(letter|digit)*
+digits = digit+
+num: digit+|digit+.digits(\L|Edigits)
+relop: \=\=|!\=|>|>\=|<|<\=
+assign: \=
+{ if else while }
+[; , \( \) { }]
+addop: \+|\-
+mulop: \*|/

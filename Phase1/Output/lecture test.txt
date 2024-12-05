@@ -1,4 +1,0 @@
-do
-Error
-Error
-double

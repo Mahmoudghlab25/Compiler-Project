@@ -2,7 +2,6 @@
 #include <utility>
 #include "State.h"
 #include "MinimizeDFA/MinimizeDFA.h"
-#include "common.h"
 #include "FileReader.cpp"
 #include "FileWriter.cpp"
 
@@ -21,139 +20,159 @@ public:
         std::string token;
         std::vector<std::string> tokens;
         std::string currentAccToken;
-        std::string prevAccToken;
-        int index = -1;
+        int index = 0;
+        int lastAccInd = 0;
+
         if (currentState->is_dead_state()) {
-            return tokens;
+            return tokens; // Return early if the starting state is dead
         }
+
         for (auto &codeline: this->codelines) {
-            while (true) {
+            index = 0;
+            token.clear();
+            currentAccToken.clear();
+            currentState = *(this->states.begin());
+            while (index < codeline.size()) {
                 if (currentState->is_dead_state()) {
-                    if(!token.empty()){
+                    if (!token.empty()) {
+                        cout << "index: " << index << ", Token: " << token << endl;
                         tokens.push_back(token);
-                        codeline = codeline.substr(prevAccToken.size());
-                    } else{
-                        tokens.emplace_back("Error");
-                        codeline = codeline.substr(1);
+                    } else {
+                        cout << "index: " << index << ", " << "ERRRRRRRRR" << endl;
+                        tokens.emplace_back("Error at index " + std::to_string(index));
                     }
                     currentState = *(this->states.begin());
-                    token = "";
-                    currentAccToken = "";
-                    prevAccToken = "";
-                    index = -1;
+                    token.clear();
+                    currentAccToken.clear();
+//                    index = lastAccInd + 1;
+                    continue;
                 }
                 if (currentState->is_accepting_state()) {
-                    if (currentAccToken.empty()) {
-                        token = currentState->get_token_type();
-                    } else if (currentAccToken.size() > prevAccToken.size()) {
-                        token = currentState->get_token_type();
-                        prevAccToken = currentAccToken;
-//                        std::cout<<"token is: "<<token<<std::endl;
+                    token = currentState->get_token_type();
+                    lastAccInd = index - 1;
+                }
+                if (codeline[index] == ' ') {
+                    if (!token.empty()) {
+                        cout << "index: " << index << ", Token: " << token << endl;
+                        tokens.push_back(token);
                     }
+                    currentState = *(this->states.begin());
+                    token.clear();
+                    currentAccToken.clear();
+                    index++;
+                    continue;
+                }
+
+
+                if (currentState->get_transitions().count(codeline[index]) > 0) {
+                    currentState = *(currentState->get_transitions().at(codeline[index]).begin());
+                    if (currentState->is_dead_state()) {
+                        index = lastAccInd;
+                    }
+                    currentAccToken += codeline[index];
+                } else {
+                    currentState = *(this->states.begin());
+
                 }
                 index++;
-                if (index >= codeline.size()) {
-                    break;
-                }
-                currentState = *(currentState->get_transitions().at(codeline[index]).begin());
-                currentAccToken += codeline[index];
             }
-            index = -1;
+
+            if (currentState->is_accepting_state()) {
+                cout << "index: " << index << ", Token: " << currentState->get_token_type() << endl;
+                tokens.push_back(currentState->get_token_type());
+            }
         }
-        if (currentState->is_accepting_state()) {
-            tokens.push_back(token);
-        }
+
         return tokens;
     }
 
 };
 
 //int main() {
-//    State *q01411 = new State(0, false, "");
-//    State *q2512 = new State(1, false, "");
-////    State *q12 = new State(2, true, "id");
-//    State *q36 = new State(3, true, "do");
-//    State *q7 = new State(4, false, "");
-//    State *q8 = new State(5, false, "");
-//    State *q9 = new State(6, false, "");
-//    State *q10 = new State(7, true, "double");
-//    State *qdead = new State(8, false, "dead");
+//    // Define all states
+//    State *q_start = new State(0, false, "");
+//    State *q_int = new State(1, true, "int");
+//    State *q_while = new State(2, true, "while");
+//    State *q_identifier = new State(3, true, "identifier");
+//    State *q_assignment = new State(4, true, "=");
+//    State *q_not_equal = new State(5, true, "!=");
+//    State *q_addition = new State(6, true, "+");
+//    State *q_number = new State(7, true, "number");
+//    State *q_comma = new State(8, true, ",");
+//    State *q_semicolon = new State(9, true, ";");
+//    State *q_open_paren = new State(10, true, "(");
+//    State *q_close_paren = new State(11, true, ")");
+//    State *q_open_brace = new State(12, true, "{");
+//    State *q_close_brace = new State(13, true, "}");
+//    State *q_dead = new State(14, false, "dead");
 //
-//    q01411->add_transition('d', q2512);
-//    q01411->add_transition('a', qdead);
-//    q01411->add_transition('o', qdead);
-//    q01411->add_transition('u', qdead);
-//    q01411->add_transition('b', qdead);
-//    q01411->add_transition('l', qdead);
-//    q01411->add_transition('e', qdead);
+//// Transitions for `int`
+//    q_start->add_transition('i', q_int);
+//    q_int->add_transition('n', q_int);
+//    q_int->add_transition('t', q_int);
 //
-//    q2512->add_transition('a', qdead);
-//    q2512->add_transition('d', qdead);
-//    q2512->add_transition('o', q36);
-//    q2512->add_transition('u', qdead);
-//    q2512->add_transition('b', qdead);
-//    q2512->add_transition('l', qdead);
-//    q2512->add_transition('e', qdead);
+//// Transitions for `while`
+//    q_start->add_transition('w', q_while);
+//    q_while->add_transition('h', q_while);
+//    q_while->add_transition('i', q_while);
+//    q_while->add_transition('l', q_while);
+//    q_while->add_transition('e', q_while);
 //
-////    q12->add_transition('a', qdead);
-////    q12->add_transition('d', qdead);
-////    q12->add_transition('o', qdead);
-////    q12->add_transition('u', qdead);
-////    q12->add_transition('b', qdead);
-////    q12->add_transition('l', qdead);
-////    q12->add_transition('e', qdead);
+//// Transitions for identifiers (e.g., `sum`, `count`, etc.)
+//    for (char c = 'a'; c <= 'z'; c++) {
+//        q_start->add_transition(c, q_identifier);
+//        q_identifier->add_transition(c, q_identifier);
+//    }
+//    for (char c = 'A'; c <= 'Z'; c++) {
+//        q_start->add_transition(c, q_identifier);
+//        q_identifier->add_transition(c, q_identifier);
+//    }
+//    for (char c = '0'; c <= '9'; c++) {
+//        q_identifier->add_transition(c, q_identifier);
+//    }
+//    q_identifier->add_transition('_', q_identifier);
 //
-//    q36->add_transition('a', qdead);
-//    q36->add_transition('d', qdead);
-//    q36->add_transition('o', qdead);
-//    q36->add_transition('u', q7);
-//    q36->add_transition('b', qdead);
-//    q36->add_transition('l', qdead);
-//    q36->add_transition('e', qdead);
+//// Transitions for digits (e.g., `10`, `1`)
+//    for (char c = '0'; c <= '9'; c++) {
+//        q_start->add_transition(c, q_number);
+//        q_number->add_transition(c, q_number);
+//    }
 //
-//    q7->add_transition('a', qdead);
-//    q7->add_transition('d', qdead);
-//    q7->add_transition('o', qdead);
-//    q7->add_transition('u', qdead);
-//    q7->add_transition('b', q8);
-//    q7->add_transition('l', qdead);
-//    q7->add_transition('e', qdead);
+//// Transitions for `=` and `!=`
+//    q_start->add_transition('=', q_assignment);
+//    q_start->add_transition('!', q_not_equal);
+//    q_not_equal->add_transition('=', q_not_equal);
 //
-//    q8->add_transition('a', qdead);
-//    q8->add_transition('d', qdead);
-//    q8->add_transition('o', qdead);
-//    q8->add_transition('u', qdead);
-//    q8->add_transition('b', qdead);
-//    q8->add_transition('l', q9);
-//    q8->add_transition('e', qdead);
+//// Transitions for `+`
+//    q_start->add_transition('+', q_addition);
 //
-//    q9->add_transition('a', qdead);
-//    q9->add_transition('d', qdead);
-//    q9->add_transition('o', qdead);
-//    q9->add_transition('u', qdead);
-//    q9->add_transition('b', qdead);
-//    q9->add_transition('l', qdead);
-//    q9->add_transition('e', q10);
+//// Transitions for delimiters
+//    q_start->add_transition(',', q_comma);
+//    q_start->add_transition(';', q_semicolon);
+//    q_start->add_transition('(', q_open_paren);
+//    q_start->add_transition(')', q_close_paren);
+//    q_start->add_transition('{', q_open_brace);
+//    q_start->add_transition('}', q_close_brace);
 //
-//    q10->add_transition('a', qdead);
-//    q10->add_transition('d', qdead);
-//    q10->add_transition('o', qdead);
-//    q10->add_transition('u', qdead);
-//    q10->add_transition('b', qdead);
-//    q10->add_transition('l', qdead);
-//    q10->add_transition('e', qdead);
+//// Dead state for invalid transitions
+//    for (char c = 0; c < 128; c++) {
+//        q_start->add_transition(c, q_dead);
+//        q_dead->add_transition(c, q_dead);
+//    }
 //
-//    qdead->add_transition('a', qdead);
-//    qdead->add_transition('d', qdead);
-//    qdead->add_transition('o', qdead);
-//    qdead->add_transition('u', qdead);
-//    qdead->add_transition('b', qdead);
-//    qdead->add_transition('l', qdead);
-//    qdead->add_transition('e', qdead);
+//// Link everything into the DFA
+//    std::set<State *> dfa = {q_start, q_int, q_while, q_identifier, q_assignment, q_not_equal,
+//                             q_addition, q_number, q_comma, q_semicolon, q_open_paren,
+//                             q_close_paren, q_open_brace, q_close_brace, q_dead};
 //
-//    std::set<char> alphabet = {'a', 'd', 'o', 'u', 'b', 'l', 'e'};
-//    std::set<State *> dfa = {q01411, q2512, q36, q7, q8, q9, q10, qdead};
-//    std::vector<std::unordered_map<char, int>> transitionTable = {};
+//    std::set<char> alphabet = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
+//                               'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
+//                               'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
+//                               'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
+//                               '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '=', '!', '+',
+//                               ',', ';', '(', ')', '{', '}', '_'};
+//
+//     std::vector<std::unordered_map<char, int>> transitionTable = {};
 ////    MinimizeDFA minimizer;
 ////    std::set<State *> minimized_dfa = minimizer.minDFA(dfa, transitionTable, alphabet);
 ////    std::cout << "Minimized DFA States:\n";
@@ -172,13 +191,6 @@ public:
 //    FileWriter fileWriter("lecture test");
 //    fileWriter.writeLines(tks);
 //
-//    delete(q01411);
-//    delete(q2512);
-//    delete(q36);
-//    delete(q7);
-//    delete(q8);
-//    delete(q9);
-//    delete(q10);
-//    delete(qdead);
+//
 //    return 0;
 //}

@@ -71,7 +71,13 @@ int main() {
 
 //    handler.generateNFAs()->display();
     cout << "---------------------------------------------------" << endl << "DFA:" << endl;
-    NFAtoDFAConverter nfAtoDfaConverter(*(handler.generateNFAs()));
+    *(handler.generateNFAs());
+    set<char> alphas = handler.getAlphabet();
+    for (auto input: handler.getAlphabet()) {
+        cout << input << " ";
+    }
+    cout << endl;
+    NFAtoDFAConverter nfAtoDfaConverter(*(handler.generateNFAs()), alphas);
     nfAtoDfaConverter.create_DFA();
 //    vector<unordered_map<char, int>> trTable = nfAtoDfaConverter.get_dfa_transition_table();
 //    int i = 0;
@@ -83,9 +89,9 @@ int main() {
 //        }
 //    }
     vector<State *> states = nfAtoDfaConverter.get_dfa_states();
-    for (const auto &state: states) {
-        state->print_state();
-    }
+//    for (const auto &state: states) {
+//        state->print_state();
+//    }
     cout << "Number of DFA states: " << states.size() << endl;
     cout << "---------------------------------------------------" << endl << "MinDFA:" << endl;
     MinimizeDFA minDFA;
@@ -93,11 +99,11 @@ int main() {
 //                           'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z',
 //                           '0','1','2','3','4','5','6','7','8','9',
 //                           '+','}','{','=',';','<','>','!','(',')','*',',','-','/','.'};
-    set<State *> minStates = minDFA.minDFA(states, nfAtoDfaConverter.get_dfa_transition_table());
-    for (auto st: minStates) {
-        st->print_state();
-    }
-    cout << "Number of min DFA states: "<<minStates.size() << endl;
+    set<State *> minStates = minDFA.minDFA(states, nfAtoDfaConverter.get_dfa_transition_table(), alphas);
+//    for (auto st: minStates) {
+//        st->print_state();
+//    }
+    cout << "Number of min DFA states: " << minStates.size() << endl;
     cout << "--------------------------------------------------" << endl << "Minimized Transition Table:" << endl;
 //    map<int, std::unordered_map<char, int>> minTransitionTable = MinimizeDFA::getReducedTransitionTable(minStates);
 //    for (const auto &stTable: minTransitionTable) {
@@ -106,5 +112,14 @@ int main() {
 //            cout << "character: " << pair.first << ", Target state id: " << pair.second << endl;
 //        }
 //    }
-
+    FileReader fileReader(
+            R"(C:\Users\Mahmo\OneDrive - Alexandria University\Documents\GitHub\Compiler-Project\Phase1\Input\lecture test.txt)");
+    vector<string> lines = fileReader.readLines();
+    LexicalAnalyzer lexicalAnalyzer(lines, minStates);
+//    FileWriter fileWriter(
+//            R"(test)");
+    vector<string> tokens = lexicalAnalyzer.analyze();
+    for (const auto& token: tokens) {
+        cout << token << endl;
+    }
 }

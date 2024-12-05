@@ -12,17 +12,18 @@ public:
     }
 
     void writeLines(const std::vector<std::string> &tokens) {
-        std::ofstream outputFile(this->filePath);
+        // Explicitly clear the file content by opening it in truncation mode
+        std::ofstream outputFile(this->filePath, std::ios::trunc);
 
         if (!outputFile.is_open()) {
             std::cerr << "Error: Unable to open file " << this->filePath << std::endl;
             return;
         }
 
-        for (const auto &token: tokens) {
+        for (const auto &token : tokens) {
             outputFile << token << std::endl;
         }
 
-        outputFile.close();
+        outputFile.close(); // Optional since the destructor will close it
     }
 };
