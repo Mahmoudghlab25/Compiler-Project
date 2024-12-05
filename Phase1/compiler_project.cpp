@@ -62,22 +62,19 @@ int main() {
     auto rules = handler.readRules(
             R"(C:\Users\Mahmo\OneDrive - Alexandria University\Documents\GitHub\Compiler-Project\Phase1\rules.txt)");
     rules.pop_back();
-
-    handler.extractStatements(rules);
-
     handler.extractKeywords(rules);
-
     handler.extractPunctuation(rules);
+    handler.extractStatements(rules);
 
 //    handler.generateNFAs()->display();
     cout << "---------------------------------------------------" << endl << "DFA:" << endl;
-    *(handler.generateNFAs());
+    NFA *nfa = (handler.generateNFAs());
     set<char> alphas = handler.getAlphabet();
     for (auto input: handler.getAlphabet()) {
         cout << input << " ";
     }
     cout << endl;
-    NFAtoDFAConverter nfAtoDfaConverter(*(handler.generateNFAs()), alphas);
+    NFAtoDFAConverter nfAtoDfaConverter(*nfa, alphas);
     nfAtoDfaConverter.create_DFA();
 //    vector<unordered_map<char, int>> trTable = nfAtoDfaConverter.get_dfa_transition_table();
 //    int i = 0;
@@ -104,21 +101,23 @@ int main() {
 //        st->print_state();
 //    }
     cout << "Number of min DFA states: " << minStates.size() << endl;
-    cout << "--------------------------------------------------" << endl << "Minimized Transition Table:" << endl;
-    map<int, std::unordered_map<char, int>> minTransitionTable = MinimizeDFA::getReducedTransitionTable(minStates);
-    for (const auto &stTable: minTransitionTable) {
-        cout << "State number " << stTable.first << endl;
-        for (auto pair: stTable.second) {
-            cout << "character: " << pair.first << ", Target state id: " << pair.second << endl;
-        }
-    }
-    FileReader fileReader(
-            R"(C:\Users\Mahmo\OneDrive - Alexandria University\Documents\GitHub\Compiler-Project\Phase1\Input\lecture test.txt)");
-    vector<string> lines = fileReader.readLines();
+//    cout << "--------------------------------------------------" << endl << "Minimized Transition Table:" << endl;
+//    map<int, std::unordered_map<char, int>> minTransitionTable = MinimizeDFA::getReducedTransitionTable(minStates);
+//    for (const auto &stTable: minTransitionTable) {
+//        cout << "State number " << stTable.first << endl;
+//        for (auto pair: stTable.second) {
+//            cout << "character: " << pair.first << ", Target state id: " << pair.second << endl;
+//        }
+//    }
+    FileReader fileReader;
+    string path = R"(C:\Users\Mahmo\OneDrive - Alexandria University\Documents\GitHub\Compiler-Project\Phase1\Input\test program.txt)";
+    vector<string> lines = fileReader.readLines(path);
+
     LexicalAnalyzer lexicalAnalyzer(lines, minStates);
 //    FileWriter fileWriter(
 //            R"(test)");
     vector<string> tokens = lexicalAnalyzer.analyze();
+//    fileWriter.writeLines(tokens);
     for (int i = 0; i < tokens.size(); i += 2) {
         cout << tokens[i] << " : " << tokens[i + 1] << endl;
     }

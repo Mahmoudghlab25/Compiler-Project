@@ -4,6 +4,7 @@
 #include "MinimizeDFA/MinimizeDFA.h"
 #include "FileReader.cpp"
 #include "FileWriter.cpp"
+#include "LexicalRulesHandler.h"
 
 class LexicalAnalyzer {
 private:
@@ -20,15 +21,16 @@ public:
         std::string token;
         std::vector<std::string> tokens;
         std::string currentAccToken;
-        int index = 0;
+        int index;
+        int errIndex;
         int lastAccInd = 0;
-
         if (currentState->is_dead_state()) {
             return tokens; // Return early if the starting state is dead
         }
 
         for (auto &codeline: this->codelines) {
             index = 0;
+            errIndex = 0;
             token.clear();
             currentAccToken.clear();
             currentState = *(this->states.begin());
@@ -40,6 +42,8 @@ public:
                         tokens.push_back(token);
                     } else {
 //                        cout << "index: " << index << ", " << "ERRRRRRRRR" << endl;
+                        errIndex++;
+                        index = errIndex;
                         tokens.emplace_back("Error at index " + std::to_string(index));
                     }
                     currentState = *(this->states.begin());
@@ -50,6 +54,7 @@ public:
                 if (currentState->is_accepting_state()) {
                     token = currentState->get_token_type();
                     lastAccInd = index - 1;
+                    errIndex = index;
                 }
                 if (codeline[index] == ' ') {
                     if (!token.empty()) {
@@ -63,23 +68,19 @@ public:
                     index++;
                     continue;
                 }
-
-
                 if (currentState->get_transitions().count(codeline[index]) > 0) {
                     currentState = *(currentState->get_transitions().at(codeline[index]).begin());
                     if (currentState->is_dead_state()) {
                         index = lastAccInd;
+                    } else{
+                        currentAccToken += codeline[index];
                     }
-                    currentAccToken += codeline[index];
                 } else {
                     currentState = *(this->states.begin());
-
                 }
                 index++;
             }
-
             if (currentState->is_accepting_state()) {
-                cout << "index: " << index << ", Token: " << currentState->get_token_type() << endl;
                 tokens.push_back(currentAccToken);
                 tokens.push_back(currentState->get_token_type());
             }
@@ -88,6 +89,74 @@ public:
         return tokens;
     }
 
+    //abcfda
+    std::vector<std::string> Analyze() {
+        State *currentState = *(this->states).begin();//s0
+        std::string token;//""
+        std::vector<std::string> tokens;//{}
+        int index = 0;//
+        int stIndex = 0;//
+        int lastAccIndex = -1;//
+        if (currentState->is_dead_state()) {
+            return tokens;
+        }
+        for (auto &codeline: this->codelines) {
+            index = 0;
+            token.clear();//""
+            stIndex = 0;
+            lastAccIndex = -1;
+            currentState = *(this->states).begin();//abcfda
+            while (index < codeline.size()) {//a
+                if (currentState->get_transitions().count(codeline[index]) > 0) {
+                    currentState = *(currentState->get_transitions().at(codeline[index])).begin();
+                }
+                //dead
+                if (currentState->is_dead_state() || codeline[index] == ' ') {
+                    //err
+                    if (lastAccIndex == -1) {
+                        string err = codeline.substr(stIndex, index - stIndex + 1);
+                        tokens.emplace_back(trim(err));
+                        if (codeline[index] != ' ') {
+                            tokens.emplace_back("Error");
+                        }
+                        stIndex = index;
+                        currentState = *(this->states).begin();
+                    }
+                        //last token
+                    else {
+                        string acc = codeline.substr(stIndex, lastAccIndex - stIndex + 1);
+                        tokens.emplace_back(trim(acc));
+                        tokens.push_back(token);
+                        token.clear();
+                        index = lastAccIndex + 1;
+                        lastAccIndex = -1;
+                        stIndex = index;
+                        currentState = *(this->states).begin();
+                        continue;
+                    }
+                }
+                    //Acc
+                else if (currentState->is_accepting_state()) {
+                    lastAccIndex = index;
+                    token = currentState->get_token_type();
+                }
+                // else it is normal; continue
+                index++;
+            }
+            if (currentState->is_accepting_state()) {
+                string acc = codeline.substr(stIndex, codeline.size() - stIndex);
+                tokens.emplace_back(trim(acc));
+                tokens.push_back(currentState->get_token_type());
+            } else {
+                string err = codeline.substr(stIndex, codeline.size() - stIndex);
+                tokens.emplace_back(trim(err));
+                if (codeline[index] != ' ') {
+                    tokens.emplace_back("Error");
+                }
+            }
+        }
+        return tokens;
+    }
 };
 
 //int main() {

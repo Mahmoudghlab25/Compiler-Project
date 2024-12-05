@@ -48,3 +48,4 @@ public:
     NFA* generateNFAs();
     std::set<char> getAlphabet();
 };
+string trim(string& s);

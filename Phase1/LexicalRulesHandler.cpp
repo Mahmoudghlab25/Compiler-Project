@@ -1,11 +1,10 @@
 #include "LexicalRulesHandler.h"
 #include "LexicalRulesCommon.h"
-#include "LexicalRulesCommon.cpp"
 #include "NFA.h"
-#include "NFA.cpp"
+
 using namespace std;
 
-string trim(string& s) {
+string trim(string &s) {
 
     if (s.empty()) { return string(); }
 
@@ -24,7 +23,7 @@ string trim(string& s) {
     return string(s, start, end - start + 1);
 }
 
-vector<string> splitOnce(const string& s, char splitChar, char splitCharAlt) {
+vector<string> splitOnce(const string &s, char splitChar, char splitCharAlt) {
     int i = 0;
     char separator = 0;
     while (i < s.size()) {
@@ -35,29 +34,27 @@ vector<string> splitOnce(const string& s, char splitChar, char splitCharAlt) {
 
     if (i == 0) {
         // op, RHS, no LHS
-        return vector<string> {
+        return vector<string>{
                 string(), string(1, separator), string(s, i + 1)
         };
-    }
-    else if (i == s.size() - 1) {
+    } else if (i == s.size() - 1) {
         // LHS, op, no RHS
-        return vector<string> {
+        return vector<string>{
                 string(s, 0, i - 1), string(1, separator), string()
         };
-    }
-    else if (i == s.size()) {
+    } else if (i == s.size()) {
         // LHS, no op, no RHS
-        return vector<string> {
+        return vector<string>{
                 string(s, i + 1), string(), string()
         };
     }
 
-    return vector<string> {
+    return vector<string>{
             string(s, 0, i), string(1, separator), string(s, i + 1)
     };
 }
 
-vector<string> LexicalRulesHandler::readRules(const char* fileName) {
+vector<string> LexicalRulesHandler::readRules(const char *fileName) {
     vector<string> lines;
     ifstream file(fileName);
 
@@ -74,39 +71,34 @@ vector<string> LexicalRulesHandler::readRules(const char* fileName) {
     return lines;
 }
 
-bool checkValidLHS(const string& lhs) {
+bool checkValidLHS(const string &lhs) {
     if (lhs.empty() || lhs.size() == 1) { return false; }
-    for (char c : lhs) {
+    for (char c: lhs) {
         if (!isalnum(c) && c != '_') { return false; }
     }
     return true;
 }
 
 void LexicalRulesHandler::addStatement(
-        unordered_map<string, string>& statementHolder,
-        const string& lhs,
-        const string& rhs
+        unordered_map<string, string> &statementHolder,
+        const string &lhs,
+        const string &rhs
 ) {
     if (statementHolder.find(lhs) == statementHolder.end()) {
         statementHolder[lhs] = rhs;
-    }
-    else {
+    } else {
         statementHolder[lhs] += "|" + rhs;
     }
 }
 
-void LexicalRulesHandler::extractStatements(const vector<string>& rules) {
-
-
+void LexicalRulesHandler::extractStatements(const vector<string> &rules) {
     for (int i = 0; i < rules.size(); i++) {
         // assuming rules are trimmed
         if (rules[i][0] == LEFT_CURLY || rules[i][0] == LEFT_SQUARE) { continue; }
         vector<string> splittedRule = splitOnce(rules[i], EQUAL, COLON);
-
-        const string& lhs = trim(splittedRule[0]);
-        const string& op = trim(splittedRule[1]);
-        const string& rhs = trim(splittedRule[2]);
-
+        const string &lhs = trim(splittedRule[0]);
+        const string &op = trim(splittedRule[1]);
+        const string &rhs = trim(splittedRule[2]);
         if (!checkValidLHS(lhs)) {
             throw runtime_error("Invalid LHS at rule " + (i + 1));
         }
@@ -118,19 +110,16 @@ void LexicalRulesHandler::extractStatements(const vector<string>& rules) {
             // no RHS
             throw runtime_error("Invalid RHS at rule " + (i + 1));
         }
-
         allNames.insert(lhs);
-        order.push_back(lhs);
         addStatement(statements, lhs, rhs);
-
         if (op[0] == COLON) {
             expNames.insert(lhs);
+            order.push_back(lhs);
         }
-
     }
 }
 
-void LexicalRulesHandler::extractKeywords(const vector<string>& rules) {
+void LexicalRulesHandler::extractKeywords(const vector<string> &rules) {
     for (int i = 0; i < rules.size(); i++) {
         // removing any leading/trailing whitespaces
         // TODO: do that after reading from file
@@ -143,12 +132,12 @@ void LexicalRulesHandler::extractKeywords(const vector<string>& rules) {
         string keyword;
         while (stream >> keyword) {
             keyWords.insert(keyword);
+            order.push_back(keyword);
         }
-        order.push_back(keyword);
     }
 }
 
-void LexicalRulesHandler::extractPunctuation(const vector<string>& rules) {
+void LexicalRulesHandler::extractPunctuation(const vector<string> &rules) {
     for (int i = 0; i < rules.size(); i++) {
         // removing any leading/trailing whitespaces
         // TODO: do that after reading from file
@@ -161,12 +150,12 @@ void LexicalRulesHandler::extractPunctuation(const vector<string>& rules) {
         string punc;
         while (stream >> punc) {
             punctuation.insert(punc);
+            order.push_back(punc);
         }
-        order.push_back(punc);
     }
 }
 
-vector<Token> LexicalRulesHandler::parseRHS(const string& rhs) {
+vector<Token> LexicalRulesHandler::parseRHS(const string &rhs) {
     int curr = 0, next = 1;
     std::stack<Token> opStack;
     std::string stringBuffer;
@@ -176,11 +165,11 @@ vector<Token> LexicalRulesHandler::parseRHS(const string& rhs) {
     return vector<Token>{};
 }
 
-NFA* LexicalRulesHandler::generateNFAForPunctuation(const string& punc) {
+NFA *LexicalRulesHandler::generateNFAForPunctuation(const string &punc) {
     auto parser = LexicalRuleParser(punc, allNames);
     auto puncToken = parser.parse()[0];
     addToAlphabet(puncToken.value);
-    NFA* n = new NFA();
+    NFA *n = new NFA();
     return n->basic(puncToken.value[0]);
 }
 
@@ -188,13 +177,13 @@ void LexicalRulesHandler::addToAlphabet(char c) {
     alphabet.insert(c);
 }
 
-void LexicalRulesHandler::addToAlphabet(const string& val) {
-    for (const char c : val) {
+void LexicalRulesHandler::addToAlphabet(const string &val) {
+    for (const char c: val) {
         alphabet.insert(c);
     }
 }
 
-NFA* LexicalRulesHandler::generateNFA(const string& curr) {
+NFA *LexicalRulesHandler::generateNFA(const string &curr) {
     if (nfaMap.find(curr) != nfaMap.end()) {
         // if found, copy then return
         return new NFA(*nfaMap[curr]);
@@ -202,11 +191,11 @@ NFA* LexicalRulesHandler::generateNFA(const string& curr) {
     // else calculate, store in map, copy and return
     auto parser = LexicalRuleParser(statements.at(curr), allNames);
     vector<Token> tokens = parser.parse();
-    stack<NFA*> stack;
-    for (Token& token : tokens) {
+    stack<NFA *> stack;
+    for (Token &token: tokens) {
         if (token.type == OPERATION) {
             switch (token.value[0]) {
-                NFA* op1, * op2, * op, * res, *temp;
+                NFA *op1, *op2, *op, *res, *temp;
 
                 case UNION:
                     if (stack.empty()) {
@@ -283,26 +272,23 @@ NFA* LexicalRulesHandler::generateNFA(const string& curr) {
                     stack.push(res->nfa_options(seq, curr));
                     break;
             }
-        }
-        else if (token.type == LITERAL) {
+        } else if (token.type == LITERAL) {
             if (token.value.size() == 1) {
                 addToAlphabet(token.value[0]);
-                NFA* n = new NFA();
+                NFA *n = new NFA();
                 stack.push(n->basic(token.value[0]));
-            }
-            else {
+            } else {
                 addToAlphabet(token.value);
-                NFA* n = new NFA();
+                NFA *n = new NFA();
                 stack.push(n->nfa_sequence(token.value, curr));
             }
-        }
-        else {
-            NFA* definedVarNFA = generateNFA(token.value);
+        } else {
+            NFA *definedVarNFA = generateNFA(token.value);
             stack.push(definedVarNFA);
         }
     }
     // store nfa of curr in map
-    NFA* res = stack.top();
+    NFA *res = stack.top();
     stack.pop();
     if (!stack.empty()) {
         throw runtime_error("error while parsing rhs [stack not empty]");
@@ -311,9 +297,9 @@ NFA* LexicalRulesHandler::generateNFA(const string& curr) {
     return res;
 }
 
-NFA* LexicalRulesHandler::generateNFAs() {
+NFA *LexicalRulesHandler::generateNFAs() {
 
-    for (auto& p : statements) {
+    for (auto &p: statements) {
         if (nfaMap.find(p.first) == nfaMap.end()) {
             nfaMap[p.first] = generateNFA(p.first);
         }
@@ -321,27 +307,27 @@ NFA* LexicalRulesHandler::generateNFAs() {
 
     // remove definitions, not needed anymore
     vector<string> unneeded;
-    for (auto& [var, _] : nfaMap) {
+    for (auto &[var, _]: nfaMap) {
         if (expNames.find(var) == expNames.end()) {
             unneeded.push_back(var);
         }
     }
-    for (const string& var : unneeded) {
+    for (const string &var: unneeded) {
         nfaMap.erase(var);
     }
 
     // loop on keywords, punc --> nfa
-    for (auto& keyword : keyWords) {
+    for (auto &keyword: keyWords) {
         addToAlphabet(keyword);
-        NFA* nfa = new NFA();
+        NFA *nfa = new NFA();
         nfaMap[keyword] = nfa->nfa_sequence(keyword, keyword);
     }
 
-    for (auto& punc : punctuation) {
+    for (auto &punc: punctuation) {
         nfaMap[punc] = generateNFAForPunctuation(punc);
     }
 
-    NFA* res = new NFA();
+    NFA *res = new NFA();
     return res->combine(nfaMap, order);
 }
 

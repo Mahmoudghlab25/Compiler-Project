@@ -5,34 +5,42 @@ using namespace std;
 
 class FileReader {
 private:
-    string filePath;
 
 public:
-    // Constructor
-    explicit FileReader(string filePath) {
-        this->filePath = std::move(filePath);
-    }
-
-    // Method to read the file line by line
-    vector<string> readLines() {
+    vector<string> readLines(const string& fileName) {
         vector<string> lines;
-        ifstream file(this->filePath);
+        ifstream file(fileName);
 
-        if (!file.is_open()) {
-            std::cerr << "Failed to open the file with path: " << this->filePath << endl;
-        }
-
-        string line;
-        while (getline(file, line)) {
+        while (true) {
+            string line;
+            if (!getline(file, line)) {
+                lines.push_back(line);
+                break;
+            }
             lines.push_back(line);
         }
-
-        file.close();
         return lines;
     }
+    // Method to read the file line by line
+//    vector<string> readLines(string filePath) {
+//        vector<string> lines;
+//        ifstream file(filePath);
+//
+//        if (!file.is_open()) {
+//            std::cerr << "Failed to open the file with path: " << filePath << endl;
+//        }
+//
+//        string line;
+//        while (getline(file, line)) {
+//            lines.push_back(line);
+//        }
+//
+//        file.close();
+//        return lines;
+//    }
 
-    void printLines(vector<string>& codeLines) {
-        for (const auto& line : codeLines) {
+    void printLines(vector<string> &codeLines) {
+        for (const auto &line: codeLines) {
             cout << line << endl;
         }
     }

@@ -1,8 +1,8 @@
-{boolean int float}
 letter = a-z|A-Z
 digit = 0-9
-xid: letter(letter|digit)*
+id: letter(letter|digit)*
 digits = digit+
+{boolean int float}
 num: digit+|digit+.digits(\L|Edigits)
 relop: \=\=|!\=|>|>\=|<|<\=
 assign: \=
