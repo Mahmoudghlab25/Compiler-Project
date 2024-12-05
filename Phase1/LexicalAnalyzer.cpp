@@ -35,16 +35,16 @@ public:
             while (index < codeline.size()) {
                 if (currentState->is_dead_state()) {
                     if (!token.empty()) {
-                        cout << "index: " << index << ", Token: " << token << endl;
+//                        cout << "index: " << index << ", Token: " << token << endl;
+                        tokens.push_back(currentAccToken);
                         tokens.push_back(token);
                     } else {
-                        cout << "index: " << index << ", " << "ERRRRRRRRR" << endl;
+//                        cout << "index: " << index << ", " << "ERRRRRRRRR" << endl;
                         tokens.emplace_back("Error at index " + std::to_string(index));
                     }
                     currentState = *(this->states.begin());
                     token.clear();
                     currentAccToken.clear();
-//                    index = lastAccInd + 1;
                     continue;
                 }
                 if (currentState->is_accepting_state()) {
@@ -53,7 +53,8 @@ public:
                 }
                 if (codeline[index] == ' ') {
                     if (!token.empty()) {
-                        cout << "index: " << index << ", Token: " << token << endl;
+//                        cout << "index: " << index << ", Token: " << token << endl;
+                        tokens.push_back(currentAccToken);
                         tokens.push_back(token);
                     }
                     currentState = *(this->states.begin());
@@ -79,6 +80,7 @@ public:
 
             if (currentState->is_accepting_state()) {
                 cout << "index: " << index << ", Token: " << currentState->get_token_type() << endl;
+                tokens.push_back(currentAccToken);
                 tokens.push_back(currentState->get_token_type());
             }
         }

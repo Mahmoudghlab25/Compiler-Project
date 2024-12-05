@@ -105,13 +105,13 @@ int main() {
 //    }
     cout << "Number of min DFA states: " << minStates.size() << endl;
     cout << "--------------------------------------------------" << endl << "Minimized Transition Table:" << endl;
-//    map<int, std::unordered_map<char, int>> minTransitionTable = MinimizeDFA::getReducedTransitionTable(minStates);
-//    for (const auto &stTable: minTransitionTable) {
-//        cout << "State number " << stTable.first << endl;
-//        for (auto pair: stTable.second) {
-//            cout << "character: " << pair.first << ", Target state id: " << pair.second << endl;
-//        }
-//    }
+    map<int, std::unordered_map<char, int>> minTransitionTable = MinimizeDFA::getReducedTransitionTable(minStates);
+    for (const auto &stTable: minTransitionTable) {
+        cout << "State number " << stTable.first << endl;
+        for (auto pair: stTable.second) {
+            cout << "character: " << pair.first << ", Target state id: " << pair.second << endl;
+        }
+    }
     FileReader fileReader(
             R"(C:\Users\Mahmo\OneDrive - Alexandria University\Documents\GitHub\Compiler-Project\Phase1\Input\lecture test.txt)");
     vector<string> lines = fileReader.readLines();
@@ -119,7 +119,7 @@ int main() {
 //    FileWriter fileWriter(
 //            R"(test)");
     vector<string> tokens = lexicalAnalyzer.analyze();
-    for (const auto& token: tokens) {
-        cout << token << endl;
+    for (int i = 0; i < tokens.size(); i += 2) {
+        cout << tokens[i] << " : " << tokens[i + 1] << endl;
     }
 }
