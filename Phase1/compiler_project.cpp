@@ -86,9 +86,6 @@ int main() {
 //        }
 //    }
     vector<State *> states = nfAtoDfaConverter.get_dfa_states();
-//    for (const auto &state: states) {
-//        state->print_state();
-//    }
     cout << "Number of DFA states: " << states.size() << endl;
     cout << "---------------------------------------------------" << endl << "MinDFA:" << endl;
     MinimizeDFA minDFA;
@@ -97,9 +94,6 @@ int main() {
 //                           '0','1','2','3','4','5','6','7','8','9',
 //                           '+','}','{','=',';','<','>','!','(',')','*',',','-','/','.'};
     set<State *> minStates = minDFA.minDFA(states, nfAtoDfaConverter.get_dfa_transition_table(), alphas);
-//    for (auto st: minStates) {
-//        st->print_state();
-//    }
     cout << "Number of min DFA states: " << minStates.size() << endl;
 //    cout << "--------------------------------------------------" << endl << "Minimized Transition Table:" << endl;
 //    map<int, std::unordered_map<char, int>> minTransitionTable = MinimizeDFA::getReducedTransitionTable(minStates);
@@ -114,10 +108,10 @@ int main() {
     vector<string> lines = fileReader.readLines(path);
 
     LexicalAnalyzer lexicalAnalyzer(lines, minStates);
-//    FileWriter fileWriter(
-//            R"(test)");
+    FileWriter fileWriter(
+            R"(test)");
     vector<string> tokens = lexicalAnalyzer.analyze();
-//    fileWriter.writeLines(tokens);
+    fileWriter.writeLines(tokens);
     for (int i = 0; i < tokens.size(); i += 2) {
         cout << tokens[i] << " : " << tokens[i + 1] << endl;
     }

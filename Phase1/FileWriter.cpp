@@ -8,7 +8,9 @@ private:
 
 public:
     explicit FileWriter(const std::string &fileName) {
-        this->filePath = R"(C:\Users\Mahmo\OneDrive - Alexandria University\Documents\GitHub\Compiler-Project\Phase1\Output\)" + fileName + ".txt";
+        this->filePath =
+                R"(C:\Users\Mahmo\OneDrive - Alexandria University\Documents\GitHub\Compiler-Project\Phase1\Output\)" +
+                fileName + ".txt";
     }
 
     void writeLines(const std::vector<std::string> &tokens) {
@@ -20,8 +22,8 @@ public:
             return;
         }
 
-        for (const auto &token : tokens) {
-            outputFile << token << std::endl;
+        for (int i = 0; i < tokens.size(); i += 2) {
+            outputFile << tokens[i] << " : " << tokens[i + 1] << std::endl;
         }
 
         outputFile.close(); // Optional since the destructor will close it
