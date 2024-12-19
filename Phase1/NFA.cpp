@@ -243,19 +243,11 @@ NFA *NFA::nfa_options(string input, string token) {
 
 // function to compine all NFA states---------
 NFA *NFA::combine(map<string, NFA *> nfas, vector<string> &order) {
-    cout << nfas.size() << " = " << order.size() << endl;
-    for (auto o: order) {
-        cout << "o: " << o << endl;
-    }
     NFA *result = new NFA();
     int offset = 1;
     result->startState = new State(0, false, "");
     result->add_state(result->startState);
     result->stateCount += 1;
-//    for (auto m: nfas) {
-//        cout << m.first << endl;
-//        m.second->display();
-//    }
     for (int i = 0; i < order.size(); i++) {
         string pattern = order[i];
         NFA *nfa = nfas[order[i]];

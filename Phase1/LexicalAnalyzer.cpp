@@ -72,11 +72,22 @@ public:
                     currentState = *(currentState->get_transitions().at(codeline[index]).begin());
                     if (currentState->is_dead_state()) {
                         index = lastAccInd;
-                    } else{
+                    } else {
                         currentAccToken += codeline[index];
                     }
                 } else {
+                    if (!token.empty()) {
+                        tokens.push_back(currentAccToken);
+                        tokens.push_back(token);
+                    }
+                    cerr << "Error: Character " << codeline[index] << " isn't in language." << endl;
+                    string err;
+                    err += codeline[index];
+                    tokens.push_back(err);
+                    tokens.emplace_back("Error");
                     currentState = *(this->states.begin());
+                    token.clear();
+                    currentAccToken.clear();
                 }
                 index++;
             }
