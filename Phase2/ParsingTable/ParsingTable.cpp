@@ -25,9 +25,6 @@ ParsingTable::parsing_table_derivation(std::map<std::string, std::vector<std::ve
             for (const auto &i: alpha) {
                 has_epsilon = false;
                 if (terminals.find(i) != terminals.end()) {
-//                    if (i != EPSILON) {
-//                        fst.insert(i);
-//                    }
                     fst.insert(i);
                     break;
                 } else {
@@ -56,6 +53,13 @@ ParsingTable::parsing_table_derivation(std::map<std::string, std::vector<std::ve
                 for (const auto &fol: follow[non_terminal]) {
                     terminal_to_production[fol] = v;
                 }
+            }
+            std::vector<std::string> sync = {"SYNC"};
+            for (const auto &fol: follow[non_terminal]) {
+                if (terminal_to_production.find(fol) != terminal_to_production.end()) {
+                    continue;
+                }
+                terminal_to_production.insert(std::make_pair(fol, sync));
             }
         }
         parsing_table.insert(std::make_pair(non_terminal, terminal_to_production));
