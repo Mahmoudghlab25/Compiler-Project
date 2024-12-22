@@ -5,11 +5,14 @@
 #include <set>
 #include <map>
 #include <vector>
+#include <unordered_map>
 
 class ParsingTable {
+private:
+    std::set<std::string> terminals;
 public:
     ParsingTable();
-    static std::map<std::string,std::map<std::string,std::vector<std::string>>>
+    static std::unordered_map<std::string, std::unordered_map<std::string, std::vector<std::string>>>
     parsing_table_derivation(std::map<std::string, std::vector<std::vector<std::string>>> grammar,
                              const std::set<std::string> &terminals,
                              const std::set<std::string> &non_terminals,
