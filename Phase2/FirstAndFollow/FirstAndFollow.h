@@ -2,6 +2,7 @@
 #define COMPILER_PROJECT_FIRSTANDFOLLOW_H
 #include <iostream>
 #include <bits/stdc++.h>
+#include "../Symbols.h"
 
 class FirstAndFollow{
 private:

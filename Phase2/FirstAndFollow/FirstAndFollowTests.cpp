@@ -11,10 +11,10 @@ protected:
     void SetUp() override {
         grammar = {
                 {"S", {{"A", "B"}}},
-                {"A", {{"a"}, {"\0"}}},
+                {"A", {{"a"}, {EPSILON}}},
                 {"B", {{"b"}}}
         };
-        terminals = {"a", "b","\0"};
+        terminals = {"a", "b",EPSILON};
         non_terminals = {"S", "A", "B"};
         start_non_terminal = "S";
     }
@@ -22,7 +22,7 @@ protected:
 
 TEST_F(FirstAndFollowTest, ComputeNonTerminalFirst) {
     FirstAndFollow ff(grammar, terminals, non_terminals, start_non_terminal);
-    std::set<std::string> expected_first_A = {"a", "\0"};
+    std::set<std::string> expected_first_A = {"a", EPSILON};
     std::set<std::string> expected_first_B = {"b"};
     std::set<std::string> expected_first_S = {"a", "b"};
 
@@ -35,7 +35,7 @@ TEST_F(FirstAndFollowTest, CreateFirst) {
     FirstAndFollow ff(grammar, terminals, non_terminals, start_non_terminal);
     ff.create_first();
     std::map<std::string, std::set<std::string>> expected_first = {
-            {"A", {"a", "\0"}},
+            {"A", {"a", EPSILON}},
             {"B", {"b"}},
             {"S", {"a", "b"}}
     };
@@ -69,7 +69,7 @@ TEST_F(FirstAndFollowTest, FullFirstAndFollow) {
     ff.create_first_and_follow();
 
     std::map<std::string, std::set<std::string>> expected_first = {
-            {"A", {"a", "\0"}},
+            {"A", {"a", EPSILON}},
             {"B", {"b"}},
             {"S", {"a", "b"}}
     };

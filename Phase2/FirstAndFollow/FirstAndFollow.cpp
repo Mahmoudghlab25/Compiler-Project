@@ -31,14 +31,14 @@ set<string> FirstAndFollow::compute_non_terminal_first(string non_terminal){
                 set<string> non_terminal_first = compute_non_terminal_first(element);
                 bool temp = false;
                 for(auto e : non_terminal_first){
-                    if(e != "\0") result.insert(e);
+                    if(e != EPSILON) result.insert(e);
                     else temp = true;
                 }
                 if(!temp) break;
                 else cnt++;
             }
         }
-        if(cnt==production.size()) result.insert("\0");
+        if(cnt==production.size()) result.insert(EPSILON);
     }
     return result;
 }
@@ -61,8 +61,8 @@ void FirstAndFollow::compute_non_terminal_follow(string non_terminal){
                         else{
                             for(int j=i+1 ; j<production.size() ; j++) {
                                 follow[non_terminal].insert(first[production[j]].begin(), first[production[j]].end());
-                                follow[non_terminal].erase("\0");
-                                if (first[production[j]].find("\0") == first[production[j]].end()) {
+                                follow[non_terminal].erase(EPSILON);
+                                if (first[production[j]].find(EPSILON) == first[production[j]].end()) {
                                     break;
                                 }
                                 else if(j==production.size()-1){

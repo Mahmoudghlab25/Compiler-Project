@@ -11,12 +11,12 @@ protected:
     void SetUp() override {
         grammar = {
                 {"E", {{"T", "E`"}}},
-                {"E`", {{"+", "T", "E`"}, {"\0"}}},
+                {"E`", {{"+", "T", "E`"}, {EPSILON}}},
                 {"T", {{"F", "T`"}}},
-                {"T`", {{"*", "F", "T`"}, {"\0"}}},
+                {"T`", {{"*", "F", "T`"}, {EPSILON}}},
                 {"F", {{"(", "E", ")"}, {"id"}}}
         };
-        terminals = {"+", "*", "(", ")", "id", "\0"};
+        terminals = {"+", "*", "(", ")", "id", EPSILON};
         non_terminals = {"E", "E`", "T", "T`", "F"};
         start_non_terminal = "E";
     }
@@ -38,9 +38,9 @@ TEST_F(FirstAndFollowTest2, CreateFirst) {
     ff.create_first();
     std::map<std::string, std::set<std::string>> expected_first = {
             {"E", {"(", "id"}},
-            {"E`", {"+", "\0"}},
+            {"E`", {"+", EPSILON}},
             {"T", {"(", "id"}},
-            {"T`", {"*", "\0"}},
+            {"T`", {"*", EPSILON}},
             {"F", {"(", "id"}}
     };
 
@@ -77,9 +77,9 @@ TEST_F(FirstAndFollowTest2, FullFirstAndFollow) {
 
     std::map<std::string, std::set<std::string>> expected_first = {
             {"E", {"(", "id"}},
-            {"E`", {"+", "\0"}},
+            {"E`", {"+", EPSILON}},
             {"T", {"(", "id"}},
-            {"T`", {"*", "\0"}},
+            {"T`", {"*", EPSILON}},
             {"F", {"(", "id"}}
     };
 
