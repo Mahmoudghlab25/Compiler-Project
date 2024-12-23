@@ -76,7 +76,7 @@ void stack_parser::parse(
             action = string_stack(this->parserStack);
             actions.push(action);
         }
-        else if(prod[0] == "epsilon"){
+        else if(prod[0] == EPSILON){
             this->parserStack.pop();
             action = string_stack(this->parserStack);
             actions.push(action);

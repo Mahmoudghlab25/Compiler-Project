@@ -1,12 +1,15 @@
+#ifndef STACK_PARSER_H
+#define STACK_PARSER_H
 #include <map>
 #include <string>
 #include <vector>
 #include<stack>
 #include <queue>
 #include <set>
-#ifndef STACK_PARSER_H
-#define STACK_PARSER_H
+#include <iostream>
+#include "../Symbols.h"
 using namespace std;
+
 class stack_parser{
     private:
        map<string,map<string, vector<string>>> parserTable;
