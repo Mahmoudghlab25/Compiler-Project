@@ -1,6 +1,6 @@
 #include "stack_parser.h"
 // #include <FirstAndFollow.h>
-stack_parser:: stack_parser(map<string,map<string, vector<string>>> parserTable, string statrSymbol, vector<string>tokens){
+stack_parser:: stack_parser(unordered_map<string,unordered_map<string, vector<string>>> parserTable, string statrSymbol, vector<string>tokens){
     this->parserTable = parserTable;
     this->startSymbol = statrSymbol;
     this->index = 0;
@@ -60,10 +60,10 @@ void stack_parser::parse(
         }
         else{
             // error 1
-            actions.push("error");
+            actions.push("Inserted error");
+            this->parserStack.pop();
             action = string_stack(this->parserStack);
             actions.push(action);
-            this->parserStack.pop();
             current = parserStack.top();
         }
      }else{
@@ -72,7 +72,7 @@ void stack_parser::parse(
         if(prod.size() == 0){
             // error 2 will skip this token and get the next
             nextToken = this->get_next_token();
-            actions.push("error");
+            actions.push("Discard error");
             action = string_stack(this->parserStack);
             actions.push(action);
         }
@@ -82,6 +82,15 @@ void stack_parser::parse(
             actions.push(action);
             string prd = current;
             prd += "--> epsilon";
+            prodaction.push_back(prd);
+        }
+        else if(prod[0]=="SYNC"){
+            this->parserStack.pop();
+            action = string_stack(this->parserStack);
+            actions.push("SYNC error");
+            actions.push(action);
+            string prd = current;
+            prd += "--> SYNC";
             prodaction.push_back(prd);
         }
         else{

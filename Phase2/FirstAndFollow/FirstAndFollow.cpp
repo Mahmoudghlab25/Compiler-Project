@@ -49,7 +49,13 @@ void FirstAndFollow::create_first() {
     }
 }
 
+unordered_set<string> visited; // Track visited non-terminals in the current recursion
 void FirstAndFollow::compute_non_terminal_follow(string non_terminal){
+    if (visited.find(non_terminal) != visited.end()) {
+        return; // Prevent infinite recursion
+    }
+    visited.insert(non_terminal);
+
     for(auto [lhs, productions]:grammar){
         for(auto production:productions){
             for(int i=0 ; i<production.size() ; i++){
@@ -65,15 +71,15 @@ void FirstAndFollow::compute_non_terminal_follow(string non_terminal){
                                 if (first[production[j]].find(EPSILON) == first[production[j]].end()) {
                                     break;
                                 }
-                                else if(j==production.size()-1){
-                                    if(follow[lhs].empty())
-                                        compute_non_terminal_follow(lhs);
+                                if(j==production.size()-1){
+                                    compute_non_terminal_follow(lhs);
                                     follow[non_terminal].insert(follow[lhs].begin(),follow[lhs].end());
                                 }
                             }
                         }
                     }
                     else{
+                        compute_non_terminal_follow(lhs);
                         follow[non_terminal].insert(follow[lhs].begin(),follow[lhs].end());
                     }
                 }
@@ -86,6 +92,7 @@ void FirstAndFollow::create_follow() {
     follow[start_non_terminal].insert("$");
     for(auto non_terminal : non_terminals){
         compute_non_terminal_follow(non_terminal);
+        visited.clear();
     }
 }
 

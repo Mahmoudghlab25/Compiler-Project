@@ -1,6 +1,6 @@
 #ifndef STACK_PARSER_H
 #define STACK_PARSER_H
-#include <map>
+#include <unordered_map>
 #include <string>
 #include <vector>
 #include<stack>
@@ -12,7 +12,7 @@ using namespace std;
 
 class stack_parser{
     private:
-       map<string,map<string, vector<string>>> parserTable;
+       unordered_map<string,unordered_map<string, vector<string>>> parserTable;
        stack<string> parserStack;
        queue<string> actions;
        string startSymbol;
@@ -20,7 +20,7 @@ class stack_parser{
        vector<string>tokens;
        vector<string>prodaction;
     public:
-       stack_parser(map<string,map<string, vector<string>>> parserTable, string startSymbol, vector<string>tokens);
+       stack_parser(unordered_map<string,unordered_map<string, vector<string>>> parserTable, string startSymbol, vector<string>tokens);
        queue<string> get_actions();
        void parse(
           set<std::string> terminals
