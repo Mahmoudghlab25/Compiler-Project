@@ -18,6 +18,7 @@ ParsingTable::parsing_table_derivation(std::unordered_map<std::string, std::vect
     for (const auto &non_terminal: non_terminals) {
         std::vector<std::vector<std::string>> productions = grammar[non_terminal];
         std::unordered_map<std::string, std::vector<std::string>> terminal_to_production;
+        bool epsilon_production = false;
         for (const auto &alpha: productions) { // A -> alpha
             std::set<std::string> fst;
             bool has_epsilon;
@@ -52,7 +53,10 @@ ParsingTable::parsing_table_derivation(std::unordered_map<std::string, std::vect
                 for (const auto &fol: follow[non_terminal]) {
                     terminal_to_production[fol] = v;
                 }
+                epsilon_production = true;
             }
+        }
+        if(!epsilon_production){
             std::vector<std::string> sync = {"SYNC"};
             for (const auto &fol: follow[non_terminal]) {
                 if (terminal_to_production.find(fol) != terminal_to_production.end()) {

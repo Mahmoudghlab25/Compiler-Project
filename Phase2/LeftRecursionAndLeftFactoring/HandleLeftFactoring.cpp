@@ -2,7 +2,9 @@
 
 using namespace std;
 HandleLeftFactoring::HandleLeftFactoring(
-        std::unordered_map<std::string, std::vector<std::vector<std::string>>> grammar) : grammar(std::move(grammar)) {}
+        std::unordered_map<std::string, std::vector<std::vector<std::string>>> grammar,std::set<std::string> non_terminals) :
+        grammar(std::move(grammar)),
+        non_terminals(non_terminals) {}
 
 std::vector<std::string> HandleLeftFactoring::find_longest_common_prefix(std::vector<std::vector<std::string>> productions) {
     if(productions.size()<=1) return {};
@@ -61,6 +63,8 @@ void HandleLeftFactoring::eliminate_left_factoring() {
             new_grammar[non_terminal].push_back(common_prefix);
 
             remaining_productions = non_common_productions;
+
+            non_terminals.insert(new_non_terminal);
         }
         new_grammar[non_terminal].insert(new_grammar[non_terminal].end(),remaining_productions.begin(),remaining_productions.end());
     }
@@ -69,4 +73,8 @@ void HandleLeftFactoring::eliminate_left_factoring() {
 
 std::unordered_map<std::string, std::vector<std::vector<std::string>>> HandleLeftFactoring::getGrammar() {
     return grammar;
+}
+
+set<std::string> HandleLeftFactoring::getNonTerminals() {
+    return non_terminals;
 }

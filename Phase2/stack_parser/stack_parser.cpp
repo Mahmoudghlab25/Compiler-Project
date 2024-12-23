@@ -83,6 +83,7 @@ void stack_parser::parse(
             string prd = current;
             prd += "--> epsilon";
             prodaction.push_back(prd);
+            current = this->parserStack.top();
         }
         else if(prod[0]=="SYNC"){
             this->parserStack.pop();
@@ -92,6 +93,7 @@ void stack_parser::parse(
             string prd = current;
             prd += "--> SYNC";
             prodaction.push_back(prd);
+            current = this->parserStack.top();
         }
         else{
 

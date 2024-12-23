@@ -5,7 +5,7 @@ using namespace std;
 
 // Test the find_longest_common_prefix method
 TEST(HandleLeftFactoringTest, FindLongestCommonPrefix) {
-    HandleLeftFactoring hl({});
+    HandleLeftFactoring hl({},{});
 
     // Case 1: No productions
     EXPECT_TRUE(hl.find_longest_common_prefix({}).empty());
@@ -43,7 +43,7 @@ TEST(HandleLeftFactoringTest, EliminateLeftFactoring) {
     unordered_map<string, vector<vector<string>>> grammar = {
             {"A", {{"a", "b", "c"}, {"a", "b", "d"}, {"e"}}}
     };
-    HandleLeftFactoring hl(grammar);
+    HandleLeftFactoring hl(grammar,set<string>({"A"}));
 
     hl.eliminate_left_factoring();
 
@@ -63,7 +63,7 @@ TEST(HandleLeftFactoringTest, EliminateLeftFactoringNoChanges) {
     unordered_map<string, vector<vector<string>>> grammar = {
             {"B", {{"x", "y"}, {"z"}}}
     };
-    HandleLeftFactoring hl(grammar);
+    HandleLeftFactoring hl(grammar,set<string>({"B"}));
 
     hl.eliminate_left_factoring();
 
@@ -78,7 +78,7 @@ TEST(HandleLeftFactoringTest, GetGrammar) {
     unordered_map<string, vector<vector<string>>> grammar = {
             {"C", {{"p", "q"}, {"r", "s"}}}
     };
-    HandleLeftFactoring hl(grammar);
+    HandleLeftFactoring hl(grammar,set<string>({"C"}));
 
     EXPECT_EQ(hl.getGrammar(), grammar);
 }
