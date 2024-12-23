@@ -1,4 +1,4 @@
-#include </media/abdelrahman/New Volume/faculty/level 4/term1/compiler/project/phase2/Compiler-Project/Phase2/stack_parser/stack_parser.h>
+#include "stack_parser.h"
 // #include <FirstAndFollow.h>
 stack_parser:: stack_parser(map<string,map<string, vector<string>>> parserTable, string statrSymbol, vector<string>tokens){
     this->parserTable = parserTable;
