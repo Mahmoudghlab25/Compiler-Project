@@ -3,7 +3,7 @@
 
 class FirstAndFollowTest : public ::testing::Test {
 protected:
-    std::map<std::string, std::vector<std::vector<std::string>>> grammar;
+    std::unordered_map<std::string, std::vector<std::vector<std::string>>> grammar;
     std::set<std::string> terminals;
     std::set<std::string> non_terminals;
     std::string start_non_terminal;

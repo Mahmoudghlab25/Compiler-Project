@@ -6,7 +6,7 @@
 
 class FirstAndFollow{
 private:
-    std::map<std::string,std::vector<std::vector<std::string>>> grammar;
+    std::unordered_map<std::string,std::vector<std::vector<std::string>>> grammar;
     std::set<std::string> terminals;
     std::set<std::string> non_terminals;
     std::map<std::string, std::set<std::string>> first;
@@ -15,7 +15,7 @@ private:
 
 public:
     FirstAndFollow(
-        std::map<std::string,std::vector<std::vector<std::string>>> grammar,
+        std::unordered_map<std::string,std::vector<std::vector<std::string>>> grammar,
         std::set<std::string> terminals,
         std::set<std::string> non_terminals,
         std::string start_non_terminal

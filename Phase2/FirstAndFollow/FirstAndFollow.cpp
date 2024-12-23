@@ -2,7 +2,7 @@
 using namespace std;
 
 FirstAndFollow::FirstAndFollow(
-        map<string,vector<vector<string>>> grammar,
+        unordered_map<string,vector<vector<string>>> grammar,
         set<string> terminals,
         set<string> non_terminals,
         string start_non_terminal
