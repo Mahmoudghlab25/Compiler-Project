@@ -3,7 +3,6 @@
 //
 
 #include "ParsingTable.h"
-#include "..\Symbols.h"
 #include <utility>
 
 ParsingTable::ParsingTable() = default;

@@ -6,6 +6,7 @@
 #include <map>
 #include <vector>
 #include <unordered_map>
+#include "..\Symbols.h"
 
 class ParsingTable {
 private:

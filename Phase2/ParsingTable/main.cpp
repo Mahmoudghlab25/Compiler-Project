@@ -6,7 +6,6 @@
 #include <map>
 #include <vector>
 #include "ParsingTable.h"
-#include "..\Symbols.h"
 
 void test1() {
     // Define grammar
