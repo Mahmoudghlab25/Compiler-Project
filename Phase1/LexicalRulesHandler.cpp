@@ -148,9 +148,14 @@ void LexicalRulesHandler::extractPunctuation(const vector<string> &rules) {
         string rule(rules[i], 1, rules[i].size() - 2);
         istringstream stream(rule);
         string punc;
+
         while (stream >> punc) {
             punctuation.insert(punc);
-            order.push_back(punc);
+            if (escapeSeqMap.find(punc) == escapeSeqMap.end()) {
+                order.push_back(punc);
+            } else {
+                order.push_back(escapeSeqMap[punc]);
+            }
         }
     }
 }
@@ -324,7 +329,11 @@ NFA *LexicalRulesHandler::generateNFAs() {
     }
 
     for (auto &punc: punctuation) {
-        nfaMap[punc] = generateNFAForPunctuation(punc);
+        if (escapeSeqMap.find(punc) == escapeSeqMap.end()) {
+            nfaMap[punc] = generateNFAForPunctuation(punc);
+        } else {
+            nfaMap[escapeSeqMap[punc]] = generateNFAForPunctuation(punc);
+        }
     }
 
     NFA *res = new NFA();

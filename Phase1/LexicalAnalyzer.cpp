@@ -35,6 +35,7 @@ public:
             currentAccToken.clear();
             currentState = *(this->states.begin());
             while (index < codeline.size()) {
+                cout << index << endl;
                 if (currentState->is_dead_state()) {
                     if (!token.empty()) {
 //                        cout << "index: " << index << ", Token: " << token << endl;

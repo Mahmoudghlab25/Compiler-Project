@@ -16,7 +16,7 @@ std::unordered_map<char, int> opPrecedence{
 std::string seqString = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
 std::unordered_set<char> specialSymbols = {
-        '-', '+', '*', '|', '(', ')', '\\'
+        '-', '+', '*', '|', '(', ')', '\\', '{', '}', '[', ']'
 };
 
 std::unordered_map<std::string, std::string> escapeSeqMap = {

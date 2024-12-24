@@ -86,15 +86,22 @@ void ParsingInterface::compute_first_and_follow_and_predictive_table() {
 
 void ParsingInterface::compute_parser() {
     get_program_tokens();
+    cout << "tokens done" << endl;
     compute_grammar();
+    cout << "grammar done" << endl;
     compute_left_recursion_and_factoring();
+    cout << "left rec factoring done" << endl;
     compute_first_and_follow_and_predictive_table();
+    cout << "ff done" << endl;
 
     stack_parser stackParser(predictive_table,order_non_terminals[0],tokens_to_parser);
     stackParser.parse(terminals);
+    cout << "parsing done" << endl;
 //    stackParser.display_action();
 
     actions = stackParser.get_actions();
+    cout << "get actions done" << endl;
     auto actions_output_path = output_path + ("actions.txt");
     file_writer.writeActionsToMarkdown(actions,actions_output_path);
+    cout << "file write done" << endl;
 }

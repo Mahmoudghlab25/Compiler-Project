@@ -39,8 +39,7 @@ int main() {
     vector<string> lines = fileReader.readLines(path);
 
     LexicalAnalyzer lexicalAnalyzer(lines, minStates);
-    FileWriter fileWriter(
-            R"(output)");
     vector<string> tokens = lexicalAnalyzer.analyze();
-    fileWriter.writeLines(tokens);
+    FileWriter fileWriter;
+    fileWriter.writeLines(tokens, R"(output.txt)");
 }
