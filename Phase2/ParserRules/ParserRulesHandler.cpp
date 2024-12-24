@@ -4,18 +4,9 @@ using namespace std;
 
 Grammar ParserRulesHandler::parseRules(const vector<string>& parserRules) {
     LexicalRulesHandler lexRulesHandler;
-    // rules for extracting tokens from defined parser rules
-    vector<string> rules = {
-        "letter = a-z|A-Z",
-        "digit = 0-9",
-        "symbol = !|\"|#|$|%|&|'|\\(|\\)|\\*|\\+|,|\\-|.|/|\\:|;|<|\\=|>|?|@|\\[|\\\\|\\]|^|_|`|\\{|\\||\\}|~",
-        "start: #",
-        "nonterminal: letter(letter|digit|_)*",
-        "terminal: '(symbol|letter|digit)+'",
-        "assign: \\:\\:\\=",
-        "or: \\|",
-        "lambda: \\L"
-    };
+    auto rules = lexRulesHandler.readRules(
+            R"(D:\Level_4_Semester_1\Compilers\Project\Compiler-Project\Phase2\rules.txt)");
+    rules.pop_back();
     lexRulesHandler.extractKeywords(rules);
     lexRulesHandler.extractPunctuation(rules);
     lexRulesHandler.extractStatements(rules);
@@ -32,6 +23,10 @@ Grammar ParserRulesHandler::parseRules(const vector<string>& parserRules) {
     );
     auto minTransitionTable = MinimizeDFA
         ::getReducedTransitionTable(minStates);
+    cout<<"Finish Min DFA\n";
+    if (minStates.empty()) {
+        throw std::runtime_error("minDFA generated an empty states set.");
+    }
     LexicalAnalyzer lexer(parserRules, minStates);
     vector<string> tokens = lexer.analyze();
 
