@@ -1,0 +1,35 @@
+
+## First Set Sets
+| Non-Terminal | First Set Values                  |
+|--------------|-------------------------------------------|
+| '(' | |
+| ')' | |
+| ';' | |
+| 'addop' | |
+| 'float' | |
+| 'id' | |
+| 'if' | |
+| 'int' | |
+| 'mulop' | |
+| 'num' | |
+| 'relop' | |
+| 'while' | |
+| '}' | |
+| ASSIGNMENT | |
+| DECLARATION | |
+| EXPRESSION | |
+| EXPRESSION`1 | |
+| FACTOR | |
+| IF | |
+| METHOD_BODY | |
+| PRIMITIVE_TYPE | |
+| SIGN | |
+| SIMPLE_EXPRESSION | |
+| SIMPLE_EXPRESSION` | |
+| STATEMENT | |
+| STATEMENT_LIST | |
+| STATEMENT_LIST` | |
+| TERM | |
+| TERM` | |
+| WHILE | |
+| epsilon | |

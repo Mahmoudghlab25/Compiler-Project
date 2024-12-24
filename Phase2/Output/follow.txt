@@ -1,0 +1,21 @@
+
+## Follow Set Sets
+| Non-Terminal | Follow Set Values                  |
+|--------------|-------------------------------------------|
+| ASSIGNMENT | |
+| DECLARATION | |
+| EXPRESSION | |
+| EXPRESSION`1 | |
+| FACTOR | |
+| IF | |
+| METHOD_BODY | $ |
+| PRIMITIVE_TYPE | |
+| SIGN | |
+| SIMPLE_EXPRESSION | |
+| SIMPLE_EXPRESSION` | |
+| STATEMENT | |
+| STATEMENT_LIST | $ |
+| STATEMENT_LIST` | $ |
+| TERM | |
+| TERM` | |
+| WHILE | |

@@ -41,9 +41,16 @@ std::vector<std::string> ParsingInterface::get_program_tokens() {
     return tokens_to_parser;
 }
 
-//TODO wait parser rules
 void ParsingInterface::compute_grammar() {
+    ParserRulesHandler p;
+    FileReader reader;
+    auto lines = reader.readLines(parser_input);
+    auto grammarParser = p.parseRules(lines);
 
+    grammar = grammarParser.grammar;
+    terminals = grammarParser.terminals;
+    non_terminals = grammarParser.nonTerminals;
+    order_non_terminals = grammarParser.NonTerminalsOrder;
 }
 
 void ParsingInterface::compute_left_recursion_and_factoring() {
@@ -64,7 +71,7 @@ void ParsingInterface::compute_left_recursion_and_factoring() {
 }
 
 void ParsingInterface::compute_first_and_follow_and_predictive_table() {
-    FirstAndFollow first_and_follow(grammar, terminals, non_terminals, "METHOD_BODY");
+    FirstAndFollow first_and_follow(grammar, terminals, non_terminals, order_non_terminals[0]);
     first_and_follow.create_first_and_follow();
     first = first_and_follow.get_first();
     follow = first_and_follow.get_follow();

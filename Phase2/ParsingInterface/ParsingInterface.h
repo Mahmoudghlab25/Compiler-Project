@@ -12,7 +12,7 @@
 #include "../Phase2/LeftRecursionAndLeftFactoring/HandleLeftRecursion.h"
 #include "../FirstAndFollow/FirstAndFollow.h"
 #include "../ParsingTable/ParsingTable.h"
-
+#include "../ParserRules/ParserRulesHandler.h"
 class ParsingInterface{
 private:
     const char * parser_input;
@@ -35,7 +35,6 @@ public:
 
     std::vector<std::string> get_program_tokens();
 
-    //TODO wait parser rules
     void compute_grammar();
 
     void compute_left_recursion_and_factoring();

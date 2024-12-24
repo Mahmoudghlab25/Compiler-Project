@@ -1,7 +1,5 @@
 #include <iostream>
-#include "ParserRules/ParserRulesHandler.h"
-#include "../Phase1/FileReader.cpp"
-
+#include "ParsingInterface/ParsingInterface.h"
 using namespace std;
 
 void print_grammar(std::unordered_map<std::string, std::vector<std::vector<std::string>>> grammar){
@@ -26,14 +24,14 @@ void print_grammar(std::unordered_map<std::string, std::vector<std::vector<std::
 }
 
 int main() {
-    ParserRulesHandler p;
-    FileReader reader;
-    string path = R"(D:\compiler_phase2_clion\Phase2\parser_input.txt)";
-    auto lines = reader.readLines(path);
-    auto grammar = p.parseRules(lines);
+    const char * parser_input_path =R"(D:\Level_4_Semester_1\Compilers\Project\Compiler-Project\Phase2\Input\parser_input.txt)";
+    const char *rules_input_path =R"(D:\Level_4_Semester_1\Compilers\Project\Compiler-Project\Phase2\Input\rules.txt)";
+    const char *program_input_path =R"(D:\Level_4_Semester_1\Compilers\Project\Compiler-Project\Phase2\Input\program_input.txt)";
+    const string output_path =R"(D:\Level_4_Semester_1\Compilers\Project\Compiler-Project\Phase2\Output\)";
 
-    print_grammar(grammar.grammar);
+    ParsingInterface p(parser_input_path,rules_input_path,program_input_path,output_path);
 
-
+    p.compute_parser();
+    return 0;
 }
 
