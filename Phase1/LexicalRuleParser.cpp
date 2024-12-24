@@ -269,15 +269,19 @@ void LexicalRuleParser::handleLastLiteral(size_t i) {
     // check if curr char cannot be added
     // if not then append stringBuffer
     if (checkMatchReset(rhs[i]) && completeMatchExists()) {
+        // to concatenate the single char with the next '('
         if (i + 1 < rhs.size() && rhs[i + 1] == LEFT_PAREN) {
             pushToStack(CONCATENATION);
         }
+        // concatenate the recognized sequence with the single char
+        // that could not be added
+        pushToStack(CONCATENATION);
         appendRecognizedSequence();
         resetStringParsing();
         // then process curr char
         output.push_back(Token(LITERAL, string(1, rhs[i])));
     }
-        // current char still cannot be added, but no complete matches exist
+    // current char still cannot be added, but no complete matches exist
     else if (checkMatchReset(rhs[i]) && !stringBuffer.empty()) {
         pushToStack(CONCATENATION);
         output.push_back(Token(LITERAL, stringBuffer));

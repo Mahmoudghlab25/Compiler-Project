@@ -1,3 +1,6 @@
+#ifndef FILEREADER_CPP
+#define FILEREADER_CPP
+
 #include <iostream>
 #include "common.h"
 
@@ -45,3 +48,5 @@ public:
         }
     }
 };
+
+#endif
