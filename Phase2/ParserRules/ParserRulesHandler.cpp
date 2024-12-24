@@ -7,30 +7,6 @@ Grammar ParserRulesHandler::parseRules(const vector<string>& parserRules) {
     auto rules = lexRulesHandler.readRules(
             R"(D:\Level_4_Semester_1\Compilers\Project\Compiler-Project\Phase2\rules.txt)");
     rules.pop_back();
-    // rules for extracting tokens from defined parser rules
-//    vector<string> rules = {
-//        "letter = a-z|A-Z",
-//        "digit = 0-9",
-//        "symbol = !|\"|#|$|%|&|'|\\(|\\)|\\*|\\+|,|\\-|.|/|\\:|;|<|\\=|>|?|@|\\[|\\\\|\\]|^|_|`|\\{|\\||\\}|~",
-//        "start: #",
-//        "nonterminal: letter(letter|digit|_)*",
-//        "terminal: '(symbol|letter|digit)+'",
-//        "assign: \\:\\:\\=",
-//        "or: \\|",
-//        "lambda: \\L"
-//    };
-//    letter = a-z|A-Z
-//    digit = 0-9
-//    id: letter(letter|digit)*
-//    digits = digit+
-//    {boolean int float}
-//    num: digit+|digit+.digits(\L|Edigits)
-//    relop: \=\=|!\=|>|>\=|<|<\=
-//    assign: \=
-//    { if else while }
-//    [; , \( \) { }]
-//    addop: \+|\-
-//    mulop: \*|/
     lexRulesHandler.extractKeywords(rules);
     lexRulesHandler.extractPunctuation(rules);
     lexRulesHandler.extractStatements(rules);
