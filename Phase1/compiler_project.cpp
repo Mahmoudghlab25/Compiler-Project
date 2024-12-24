@@ -10,7 +10,7 @@ using namespace std;
 int main() {
     LexicalRulesHandler handler;
     auto rules = handler.readRules(
-            R"(C:\Users\Mahmo\OneDrive - Alexandria University\Documents\GitHub\Compiler-Project\Phase1\rules.txt)");
+            R"(D:\compiler_phase2_clion\Phase1\rules.txt)");
     rules.pop_back();
     handler.extractKeywords(rules);
     handler.extractPunctuation(rules);
@@ -35,12 +35,12 @@ int main() {
         }
     }
     FileReader fileReader;
-    string path = R"(C:\Users\Mahmo\OneDrive - Alexandria University\Documents\GitHub\Compiler-Project\Phase1\Input\test1.txt)";
+    string path = R"(D:\compiler_phase2_clion\Phase1\input.txt)";
     vector<string> lines = fileReader.readLines(path);
 
     LexicalAnalyzer lexicalAnalyzer(lines, minStates);
     FileWriter fileWriter(
-            R"(test)");
+            R"(output)");
     vector<string> tokens = lexicalAnalyzer.analyze();
     fileWriter.writeLines(tokens);
 }

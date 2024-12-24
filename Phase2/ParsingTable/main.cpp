@@ -142,6 +142,56 @@ void test3() {
     grammar = left_recursion.getGrammar();
     non_terminals = left_recursion.getNonTerminals();
 
+    print_grammar(grammar);
+
+    HandleLeftFactoring left_factoring(grammar);
+    left_factoring.eliminate_left_factoring();
+    grammar = left_factoring.getGrammar();
+
+
+//    Create first and follow
+    FirstAndFollow first_and_follow(grammar,terminals,non_terminals,"bexpr");
+    first_and_follow.create_first_and_follow();
+    std::map<std::string, std::set<std::string>> first = first_and_follow.get_first();
+    std::map<std::string, std::set<std::string>> follow = first_and_follow.get_follow();
+
+    // Generate parsing table
+    auto parsingTable = ParsingTable::parsing_table_derivation(grammar, terminals, non_terminals, first, follow);
+
+    // Print parsing table for verification
+    for (const auto &non_terminal_entry: parsingTable) {
+        std::cout << "Non-terminal: " << non_terminal_entry.first << "\n";
+        for (const auto &terminal_entry: non_terminal_entry.second) {
+            std::cout << "  Terminal: " << terminal_entry.first << " -> [ ";
+            for (const auto &symbol: terminal_entry.second) {
+                std::cout << symbol << " ";
+            }
+            std::cout << "]\n";
+        }
+    }
+}
+
+void test4() {
+    // Define grammar
+    std::unordered_map<std::string, std::vector<std::vector<std::string>>> grammar = {
+            {"bexpr", {{"bexpr", "or", "bterm"},{"bterm"}}},
+            {"bterm", {{"bterm", "and", "bfactor"},{"bfactor"}}},
+            {"bfactor",{{"not","bfactor"},{"(","bexpr",")"},{"true"},{"false"}}}
+    };
+
+    // Define terminals and non-terminals
+    std::set<std::string> terminals = {"or", "and","not" ,"(", ")", "true","false", EPSILON};
+    std::set<std::string> non_terminals = {"bexpr", "bterm","bfactor"};
+    std::vector<std::string> order_non_terminals = {"bexpr", "bterm","bfactor"};
+
+//    Apply Left Recursion and Left Factoring
+    HandleLeftRecursion left_recursion(grammar,non_terminals,order_non_terminals);
+    left_recursion.eliminate_left_recursion();
+    grammar = left_recursion.getGrammar();
+    non_terminals = left_recursion.getNonTerminals();
+
+    print_grammar(grammar);
+
     HandleLeftFactoring left_factoring(grammar);
     left_factoring.eliminate_left_factoring();
     grammar = left_factoring.getGrammar();

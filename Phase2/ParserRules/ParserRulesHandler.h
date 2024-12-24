@@ -2,17 +2,16 @@
 #define PARSERRULESHANDLER_H
 
 #include "common.h"
-#include "LexicalRulesHandler.h"
 #include "DFAConverter.h"
 #include "MinimizeDFA.h"
-#include "LexicalAnalyzer.cpp"
+#include "GrammarRulesParser.h"
 
 typedef std::unordered_map<std::string, std::vector<std::vector<std::string>>>
 Grammar;
 
 class ParserRulesHandler {
 public:
-    Grammar parseRules(const std::vector<std::string>& parserRules);
+    GrammarRulesParser parseRules(const std::vector<std::string>& parserRules);
 };
 
 

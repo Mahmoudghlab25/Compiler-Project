@@ -7,6 +7,7 @@
 #include "LexicalRulesHandler.h"
 #include "DFAConverter.h"
 #include "MinimizeDFA.h"
+#include "../Phase2/ParserRules/ParserRulesLexer.h"
 #include <gtest/gtest.h>
 
 using namespace std;
@@ -227,7 +228,6 @@ TEST(Phase2Tests, MethodBodyGrammar) {
     stackParser.parse(terminals);
     stackParser.display_action();
 }
-
 
 int main(int argc, char **argv) {
     ::testing::InitGoogleTest(&argc, argv);
