@@ -1,21 +1,19 @@
 #include "stack_parser.h"
 // #include <FirstAndFollow.h>
-stack_parser:: stack_parser(unordered_map<string,unordered_map<string, vector<string>>> parserTable, string statrSymbol, vector<string>tokens){
-    this->parserTable = parserTable;
-    this->startSymbol = statrSymbol;
+stack_parser:: stack_parser(unordered_map<string,unordered_map<string, vector<string>>> &parserTable, string &statrSymbol, LexicalAnalyzer &lexicalAnalyzer):
+parserTable(parserTable),
+startSymbol(statrSymbol),
+lexicalAnalyzer(lexicalAnalyzer)
+{
     this->index = 0;
-    this->tokens = tokens;
 }
 
 queue<string> stack_parser:: get_actions(){return this->actions;} 
 
 string stack_parser:: get_next_token(){
-  if((this->index) < (this->tokens.size())){
-    string out = this->tokens[this->index];
-    this->index++;
-    return out;
-  }
-  return "$";
+    string token = lexicalAnalyzer.get_token();
+    cout<<token<<"\n";
+    return token;
 }
 
 string stack_parser::string_stack(stack<string> stk){

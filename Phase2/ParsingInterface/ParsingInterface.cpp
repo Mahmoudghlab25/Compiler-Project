@@ -76,15 +76,7 @@ void ParsingInterface::compute_actions() {
 
     LexicalAnalyzer lexicalAnalyzer(lines, min_states);
 
-    vector<string> tokens = lexicalAnalyzer.analyze();
-    auto tokens_output_path = output_path + ("tokens.txt");
-    file_writer.writeLines(tokens,tokens_output_path);
-
-    for(int i=1 ; i<tokens.size() ; i+=2){
-        tokens_to_parser.push_back(tokens[i]);
-    }
-
-    stack_parser stackParser(predictive_table,order_non_terminals[0],tokens_to_parser);
+    stack_parser stackParser(predictive_table,order_non_terminals[0],lexicalAnalyzer);
     stackParser.parse(terminals);
 
     actions = stackParser.get_actions();

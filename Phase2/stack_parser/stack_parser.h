@@ -8,6 +8,7 @@
 #include <set>
 #include <iostream>
 #include "../Symbols.h"
+#include "../Phase1/LexicalAnalyzer.cpp"
 using namespace std;
 
 class stack_parser{
@@ -19,8 +20,9 @@ class stack_parser{
        int index ;
        vector<string>tokens;
        vector<string>prodaction;
+       LexicalAnalyzer lexicalAnalyzer;
     public:
-       stack_parser(unordered_map<string,unordered_map<string, vector<string>>> parserTable, string startSymbol, vector<string>tokens);
+       stack_parser(unordered_map<string,unordered_map<string, vector<string>>> &parserTable, string &startSymbol, LexicalAnalyzer &lexicalAnalyzer);
        queue<string> get_actions();
        void parse(
           set<std::string> terminals

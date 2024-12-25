@@ -1,3 +1,6 @@
+#ifndef FILEWRITER_CPP
+#define FILEWRITER_CPP
+
 #include <iostream>
 #include <fstream>
 #include <vector>
@@ -114,3 +117,5 @@ public:
         std::cout << "Actions written to " << filename << "\n";
     }
 };
+
+#endif
