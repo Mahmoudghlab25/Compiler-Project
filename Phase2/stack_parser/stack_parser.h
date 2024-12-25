@@ -15,14 +15,16 @@ class stack_parser{
     private:
        unordered_map<string,unordered_map<string, vector<string>>> parserTable;
        stack<string> parserStack;
-       queue<string> actions;
+       queue<string> returnedStack;
        string startSymbol;
        int index ;
        vector<string>tokens;
        vector<string>prodaction;
+       vector<string> actions;
        LexicalAnalyzer lexicalAnalyzer;
+       string output_path;
     public:
-       stack_parser(unordered_map<string,unordered_map<string, vector<string>>> &parserTable, string &startSymbol, LexicalAnalyzer &lexicalAnalyzer);
+       stack_parser(unordered_map<string,unordered_map<string, vector<string>>> &parserTable, string &startSymbol, LexicalAnalyzer &lexicalAnalyzer,string &output_path);
        queue<string> get_actions();
        void parse(
           set<std::string> terminals

@@ -28,7 +28,7 @@ public:
         }
 
         outputFile.close(); // Optional since the destructor will close it
-        std::cout << "Tokens written to " << fileName << "\n";
+        std::cout << "Tokens written to " << fileName << "\n\n";
     }
 
     void writeGrammarToMarkdown(
@@ -59,7 +59,7 @@ public:
             file << "|\n";
         }
 
-        std::cout << "Grammar written to " << filename << "\n";
+        std::cout << "Grammar written to " << filename << "\n\n";
     }
 
     // Function to write First or Follow sets to a Markdown file
@@ -88,34 +88,52 @@ public:
         }
 
         file.close();
-        std::cout << setName << " sets written to " << filename << "\n";
+        std::cout << setName << " sets written to " << filename << "\n\n";
     }
 
-    // Function to write actions (queue) to a Markdown file
-    void writeActionsToMarkdown(const std::queue<std::string> actions,const std::string filename) {
-        std::ofstream file(filename, std::ios::out |std::ios::trunc);
+    // Function to write returnedStack (queue) to a Markdown file
+    void writeActionsToMarkdown(const std::queue<std::string>& stack,
+                                const std::vector<std::string>& tokens,
+                                const std::vector<std::string>& productions,
+                                const std::string& filename) {
+        std::ofstream file(filename, std::ios::out | std::ios::trunc);
 
         if (!file) {
             std::cerr << "Failed to open or create file: " << filename << "\n";
             return;
         }
 
-        // Write table header for actions
-        file << "\n## Actions Queue\n";
-        file << "| Action                                                                 |\n";
-        file << "|------------------------------------------------------------------------|\n";
+        // Write Markdown table header
+        file << "# Markdown Report\n\n";
+        file << "## Actions, Tokens, and Productions\n";
+        file << "| Stack Element                | Token               | Production          |\n";
+        file << "|------------------------------|---------------------|---------------------|\n";
 
-        // Copy the queue to iterate over it
-        std::queue<std::string> tempQueue = actions;
+        // Use iterators for tokens and productions
+        std::queue<std::string> tempStack = stack;
+        auto tokenIt = tokens.begin();
+        auto productionIt = productions.begin();
 
-        while (!tempQueue.empty()) {
-            file << "| " << tempQueue.front() << " |\n";
-            tempQueue.pop();
+        // Iterate through all parameters and write them side by side
+        while (!tempStack.empty() || tokenIt != tokens.end() || productionIt != productions.end()) {
+            std::string stackElement = tempStack.empty() ? "" : tempStack.front();
+            std::string token = (tokenIt != tokens.end()) ? *tokenIt : "";
+            std::string production = (productionIt != productions.end()) ? *productionIt : "";
+
+            file << "| " << stackElement
+                 << " | " << token
+                 << " | " << production
+                 << " |\n";
+
+            if (!tempStack.empty()) tempStack.pop();
+            if (tokenIt != tokens.end()) ++tokenIt;
+            if (productionIt != productions.end()) ++productionIt;
         }
 
         file.close();
-        std::cout << "Actions written to " << filename << "\n";
+//        std::cout << "Data written to " << filename << "\n";
     }
+
 };
 
 #endif
