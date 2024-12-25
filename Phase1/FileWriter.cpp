@@ -104,8 +104,8 @@ public:
         }
 
         // Write Markdown table header
-        file << "# Markdown Report\n\n";
-        file << "## Actions, Tokens, and Productions\n";
+        file << "# Parser Table\n\n";
+        file << "## Stack, Tokens, and Productions\n";
         file << "| Stack Element                | Token               | Production          |\n";
         file << "|------------------------------|---------------------|---------------------|\n";
 
@@ -131,7 +131,6 @@ public:
         }
 
         file.close();
-//        std::cout << "Data written to " << filename << "\n";
     }
 
 };
