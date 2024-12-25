@@ -2,6 +2,7 @@
 #define GRAMMARRULESPARSER_H
 
 #include "common.h"
+#include "../Symbols.h"
 
 typedef std::unordered_map<std::string, std::vector<std::vector<std::string>>>
 Grammar;

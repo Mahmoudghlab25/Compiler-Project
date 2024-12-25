@@ -13,7 +13,7 @@ string stack_parser:: get_next_token(){
   if((this->index) < (this->tokens.size())){
     string out = this->tokens[this->index];
     this->index++;
-    return "'" + out + "'";
+    return out;
   }
   return "$";
 }

@@ -66,7 +66,7 @@ void ParsingInterface::compute_left_recursion_and_factoring() {
     grammar = left_factoring.getGrammar();
     non_terminals = left_factoring.getNonTerminals();
 
-    auto grammar_output_path = output_path + ("grammar.txt");
+    auto grammar_output_path = output_path + ("grammar.md");
     file_writer.writeGrammarToMarkdown(grammar,grammar_output_path);
 }
 
@@ -77,31 +77,23 @@ void ParsingInterface::compute_first_and_follow_and_predictive_table() {
     follow = first_and_follow.get_follow();
     predictive_table = ParsingTable::parsing_table_derivation(grammar, terminals, non_terminals, first, follow);
 
-    auto first_output_path = output_path + ("first.txt");
+    auto first_output_path = output_path + ("first.md");
     file_writer.writeSetToMarkdown(first,first_output_path,"First Set");
 
-    auto follow_output_path = output_path + ("follow.txt");
+    auto follow_output_path = output_path + ("follow.md");
     file_writer.writeSetToMarkdown(follow,follow_output_path,"Follow Set");
 }
 
 void ParsingInterface::compute_parser() {
     get_program_tokens();
-    cout << "tokens done" << endl;
     compute_grammar();
-    cout << "grammar done" << endl;
     compute_left_recursion_and_factoring();
-    cout << "left rec factoring done" << endl;
     compute_first_and_follow_and_predictive_table();
-    cout << "ff done" << endl;
 
     stack_parser stackParser(predictive_table,order_non_terminals[0],tokens_to_parser);
     stackParser.parse(terminals);
-    cout << "parsing done" << endl;
-//    stackParser.display_action();
 
     actions = stackParser.get_actions();
-    cout << "get actions done" << endl;
-    auto actions_output_path = output_path + ("actions.txt");
+    auto actions_output_path = output_path + ("actions.md");
     file_writer.writeActionsToMarkdown(actions,actions_output_path);
-    cout << "file write done" << endl;
 }

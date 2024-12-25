@@ -1,6 +1,5 @@
 #include "GrammarRulesParser.h"
 
-#include <Symbols.h>
 
 using namespace std;
 
@@ -35,10 +34,11 @@ void GrammarRulesParser::generateGrammar(vector<string>& tokens) {
         }
         else {
             // nonTerminal or terminal in rhs
-            rhs.push_back(token);
             if (token[0] == '\'') {
-                terminals.insert(token);
+                rhs.push_back(string(token.begin()+1,token.end()-1));
+                terminals.insert(string(token.begin()+1,token.end()-1));
             } else {
+                rhs.push_back(token);
                 nonTerminals.insert(token);
             }
         }

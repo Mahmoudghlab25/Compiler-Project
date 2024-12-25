@@ -31,7 +31,7 @@ public:
     void writeGrammarToMarkdown(
             std::unordered_map<std::string, std::vector<std::vector<std::string>>> grammar,
             const std::string filename) {
-        std::ofstream file(filename, std::ios::out | std::ios::app);
+        std::ofstream file(filename, std::ios::out |std::ios::trunc);
 
         if (!file) {
             std::cerr << "Failed to open or create file: " << filename << "\n";
@@ -63,7 +63,7 @@ public:
     void writeSetToMarkdown(const std::map<std::string, std::set<std::string>> setMap,
                             const std::string filename,
                             const std::string setName) {
-        std::ofstream file(filename, std::ios::out | std::ios::app);
+        std::ofstream file(filename, std::ios::out |std::ios::trunc);
 
         if (!file) {
             std::cerr << "Failed to open or create file: " << filename << "\n";
@@ -79,7 +79,7 @@ public:
         for (const auto &entry : setMap) {
             file << "| " << entry.first << " | ";
             for (const auto &value : entry.second) {
-                file << value << " ";
+                file << value << "  ";
             }
             file << "|\n";
         }
@@ -90,7 +90,7 @@ public:
 
     // Function to write actions (queue) to a Markdown file
     void writeActionsToMarkdown(const std::queue<std::string> actions,const std::string filename) {
-        std::ofstream file(filename, std::ios::out | std::ios::app);
+        std::ofstream file(filename, std::ios::out |std::ios::trunc);
 
         if (!file) {
             std::cerr << "Failed to open or create file: " << filename << "\n";
