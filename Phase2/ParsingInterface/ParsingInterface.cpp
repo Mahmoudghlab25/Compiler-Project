@@ -76,12 +76,8 @@ void ParsingInterface::compute_actions() {
 
     LexicalAnalyzer lexicalAnalyzer(lines, min_states);
 
-    stack_parser stackParser(predictive_table,order_non_terminals[0],lexicalAnalyzer);
+    stack_parser stackParser(predictive_table,order_non_terminals[0],lexicalAnalyzer,output_path);
     stackParser.parse(terminals);
-
-    actions = stackParser.get_actions();
-    auto actions_output_path = output_path + ("actions.md");
-    file_writer.writeActionsToMarkdown(actions,actions_output_path);
 }
 
 void ParsingInterface::compute_parser() {
