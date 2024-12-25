@@ -7,7 +7,7 @@ using namespace std;
 ParsingInterface::ParsingInterface(const char *parserInput, const char *rulesInput, const char *programInput, string output_path)
         : parser_input(parserInput), rules_input(rulesInput), program_input(programInput), output_path(output_path) {}
 
-std::vector<std::string> ParsingInterface::get_program_tokens() {
+void ParsingInterface::compute_min_states() {
     LexicalRulesHandler handler;
     auto rules = handler.readRules(rules_input);
     rules.pop_back();
@@ -22,23 +22,9 @@ std::vector<std::string> ParsingInterface::get_program_tokens() {
 
     vector<State *> states = nfAtoDfaConverter.get_dfa_states();
     MinimizeDFA minDFA;
-    set<State *> minStates = minDFA.minDFA(states, nfAtoDfaConverter.get_dfa_transition_table(), alphas);
+    min_states = minDFA.minDFA(states, nfAtoDfaConverter.get_dfa_transition_table(), alphas);
 
-    map<int, std::unordered_map<char, int>> minTransitionTable = MinimizeDFA::getReducedTransitionTable(minStates);
-
-    FileReader fileReader;
-    vector<string> lines = fileReader.readLines(program_input);
-
-    LexicalAnalyzer lexicalAnalyzer(lines, minStates);
-
-    vector<string> tokens = lexicalAnalyzer.analyze();
-    auto tokens_output_path = output_path + ("tokens.txt");
-    file_writer.writeLines(tokens,tokens_output_path);
-
-    for(int i=1 ; i<tokens.size() ; i+=2){
-        tokens_to_parser.push_back(tokens[i]);
-    }
-    return tokens_to_parser;
+    map<int, std::unordered_map<char, int>> minTransitionTable = MinimizeDFA::getReducedTransitionTable(min_states);
 }
 
 void ParsingInterface::compute_grammar() {
@@ -84,11 +70,19 @@ void ParsingInterface::compute_first_and_follow_and_predictive_table() {
     file_writer.writeSetToMarkdown(follow,follow_output_path,"Follow Set");
 }
 
-void ParsingInterface::compute_parser() {
-    get_program_tokens();
-    compute_grammar();
-    compute_left_recursion_and_factoring();
-    compute_first_and_follow_and_predictive_table();
+void ParsingInterface::compute_actions() {
+    FileReader fileReader;
+    vector<string> lines = fileReader.readLines(program_input);
+
+    LexicalAnalyzer lexicalAnalyzer(lines, min_states);
+
+    vector<string> tokens = lexicalAnalyzer.analyze();
+    auto tokens_output_path = output_path + ("tokens.txt");
+    file_writer.writeLines(tokens,tokens_output_path);
+
+    for(int i=1 ; i<tokens.size() ; i+=2){
+        tokens_to_parser.push_back(tokens[i]);
+    }
 
     stack_parser stackParser(predictive_table,order_non_terminals[0],tokens_to_parser);
     stackParser.parse(terminals);
@@ -96,4 +90,12 @@ void ParsingInterface::compute_parser() {
     actions = stackParser.get_actions();
     auto actions_output_path = output_path + ("actions.md");
     file_writer.writeActionsToMarkdown(actions,actions_output_path);
+}
+
+void ParsingInterface::compute_parser() {
+    compute_min_states();
+    compute_grammar();
+    compute_left_recursion_and_factoring();
+    compute_first_and_follow_and_predictive_table();
+    compute_actions();
 }

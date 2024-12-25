@@ -29,17 +29,20 @@ private:
     map<string, set<string>> follow;
     unordered_map<string, unordered_map<string, vector<string>>> predictive_table;
     queue<string> actions;
+    set<State *> min_states;
 
 public:
     ParsingInterface(const char *parserInput, const char *rulesInput, const char *programInput, std::string output_path);
 
-    std::vector<std::string> get_program_tokens();
+    void compute_min_states();
 
     void compute_grammar();
 
     void compute_left_recursion_and_factoring();
 
     void compute_first_and_follow_and_predictive_table();
+
+    void compute_actions();
 
     void compute_parser();
 
