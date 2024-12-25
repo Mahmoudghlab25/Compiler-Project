@@ -57,7 +57,7 @@ void stack_parser::parse(
                 action = string_stack(this->parserStack);
                 returnedStack.push(action);
                 current = parserStack.top();
-                prodaction.push_back("Match" + nextToken);
+                prodaction.push_back("Match " + nextToken);
                 nextToken = this->get_next_token();
             }
             else{
@@ -83,7 +83,7 @@ void stack_parser::parse(
                 action = string_stack(this->parserStack);
                 returnedStack.push(action);
                 string prd = current;
-                prd += "--> epsilon";
+                prd += " >>> epsilon";
                 prodaction.push_back(prd);
                 current = this->parserStack.top();
             }
@@ -93,7 +93,7 @@ void stack_parser::parse(
 //                returnedStack.push("SYNC error");
                 returnedStack.push(action);
                 string prd = current;
-                prd += "--> SYNC";
+                prd += " >>> SYNC";
                 prodaction.push_back(prd);
                 current = this->parserStack.top();
             }
@@ -105,7 +105,7 @@ void stack_parser::parse(
                     prd = prod[i] + prd ;
                     prd += " ";
                 }
-                prd = current + "--> " + prd ;
+                prd = current + " >>> " + prd ;
                 action = string_stack(this->parserStack);
                 returnedStack.push(action);
                 current = this->parserStack.top();
