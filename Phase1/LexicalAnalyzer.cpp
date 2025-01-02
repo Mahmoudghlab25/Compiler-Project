@@ -25,7 +25,7 @@ public:
     void remove_previous_words(string token){
         // Remove all words before the last token in the current line
         if (currentLineIndex < codelines.size()) {
-            size_t lastTokenPos = this->codelines[currentLineIndex].rfind(token) + token.size();
+            size_t lastTokenPos = this->codelines[currentLineIndex].find(token) + token.size();
 
             if (lastTokenPos != std::string::npos) {
                 this->codelines[currentLineIndex] = this->codelines[currentLineIndex].substr(lastTokenPos); // Keep only the last token and beyond
