@@ -34,7 +34,7 @@ public:
     void writeGrammarToMarkdown(
             std::unordered_map<std::string, std::vector<std::vector<std::string>>> grammar,
             const std::string filename) {
-        std::ofstream file(filename, std::ios::out |std::ios::trunc);
+        std::ofstream file(filename, std::ios::out | std::ios::trunc);
 
         if (!file) {
             std::cerr << "Failed to open or create file: " << filename << "\n";
@@ -47,11 +47,11 @@ public:
         file << "|--------------|-------------------------------------------------------|\n";
 
         // Write grammar rules
-        for (const auto &entry : grammar) {
+        for (const auto &entry: grammar) {
             file << "| " << entry.first << " | ";
-            for (const auto &rule : entry.second) {
+            for (const auto &rule: entry.second) {
                 file << "[ ";
-                for (const auto &token : rule) {
+                for (const auto &token: rule) {
                     file << token << " ";
                 }
                 file << "] ";
@@ -66,7 +66,7 @@ public:
     void writeSetToMarkdown(const std::map<std::string, std::set<std::string>> setMap,
                             const std::string filename,
                             const std::string setName) {
-        std::ofstream file(filename, std::ios::out |std::ios::trunc);
+        std::ofstream file(filename, std::ios::out | std::ios::trunc);
 
         if (!file) {
             std::cerr << "Failed to open or create file: " << filename << "\n";
@@ -79,9 +79,9 @@ public:
         file << "|--------------|-------------------------------------------|\n";
 
         // Write sets
-        for (const auto &entry : setMap) {
+        for (const auto &entry: setMap) {
             file << "| " << entry.first << " | ";
-            for (const auto &value : entry.second) {
+            for (const auto &value: entry.second) {
                 file << value << "  ";
             }
             file << "|\n";
@@ -92,10 +92,10 @@ public:
     }
 
     // Function to write returnedStack (queue) to a Markdown file
-    void writeActionsToMarkdown(const std::queue<std::string>& stack,
-                                const std::vector<std::string>& tokens,
-                                const std::vector<std::string>& productions,
-                                const std::string& filename) {
+    void writeActionsToMarkdown(const std::queue<std::string> &stack,
+                                const std::vector<std::string> &tokens,
+                                const std::vector<std::string> &productions,
+                                const std::string &filename) {
         std::ofstream file(filename, std::ios::out | std::ios::trunc);
 
         if (!file) {
@@ -133,6 +133,67 @@ public:
         file.close();
     }
 
+
+    std::string join(const std::vector<std::string>& vec, const std::string& delimiter = ", ") {
+        std::ostringstream ss;
+        for (size_t i = 0; i < vec.size(); ++i) {
+            ss << vec[i];
+            if (i < vec.size() - 1) {
+                ss << delimiter;
+            }
+        }
+        return ss.str();
+    }
+
+    void writePredictiveTableToMarkdown(
+            const std::unordered_map<std::string, std::unordered_map<std::string, std::vector<std::string>>>& predictive_table,
+            const std::string& file_path)
+    {
+        // Collect all unique terminals to form the table columns
+        std::set<std::string> terminals;
+        for (const auto& row : predictive_table) {
+            for (const auto& terminal : row.second) {
+                terminals.insert(terminal.first);
+            }
+        }
+
+        std::ofstream file(file_path, std::ios::out | std::ios::trunc);
+        if (!file.is_open()) {
+            throw std::runtime_error("Could not open file: " + file_path);
+        }
+
+        // Write the header row
+        file << "| Non-Terminal ";
+        for (const auto& terminal : terminals) {
+            file << "| " << terminal << " ";
+        }
+        file << "|\n";
+
+        // Write the header separator
+        file << "|--------------";
+        for (size_t i = 0; i < terminals.size(); ++i) {
+            file << "|----------";
+        }
+        file << "|\n";
+
+        // Write each row of the predictive table
+        for (const auto& row : predictive_table) {
+            const std::string& non_terminal = row.first;
+            file << "| " << non_terminal << " ";
+
+            for (const auto& terminal : terminals) {
+                if (row.second.find(terminal) != row.second.end()) {
+                    file << "| " << join(row.second.at(terminal)) << " ";
+                } else {
+                    file << "|   "; // Empty cell
+                }
+            }
+
+            file << "|\n";
+        }
+
+        file.close();
+    }
 };
 
 #endif

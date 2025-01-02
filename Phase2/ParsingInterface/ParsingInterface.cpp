@@ -63,6 +63,9 @@ void ParsingInterface::compute_first_and_follow_and_predictive_table() {
     follow = first_and_follow.get_follow();
     predictive_table = ParsingTable::parsing_table_derivation(grammar, terminals, non_terminals, first, follow);
 
+    auto predictive_table_output_path = output_path + ("predictive_table.md");
+    file_writer.writePredictiveTableToMarkdown(predictive_table,predictive_table_output_path);
+
     auto first_output_path = output_path + ("first.md");
     file_writer.writeSetToMarkdown(first,first_output_path,"First Set");
 

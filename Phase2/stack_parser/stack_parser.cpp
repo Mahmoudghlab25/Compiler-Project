@@ -102,8 +102,7 @@ void stack_parser::parse(
                 string prd = "";
                 for (int i= prod.size() - 1; i >= 0; i--){
                     this->parserStack.push(prod[i]);
-                    prd = prod[i] + prd ;
-                    prd += " ";
+                    prd = prod[i] + "  " + prd ;
                 }
                 prd = current + " >>> " + prd ;
                 action = string_stack(this->parserStack);
